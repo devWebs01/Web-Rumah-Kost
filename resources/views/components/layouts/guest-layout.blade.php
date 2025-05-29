@@ -841,6 +841,8 @@
         <style lang="en" type="text/css" id="dark-mode-custom-style"></style>
         <style lang="en" type="text/css" id="dark-mode-native-style"></style>
         <style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
+
+        @vite([])
     </head>
 
     <body>

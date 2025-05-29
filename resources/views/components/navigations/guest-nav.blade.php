@@ -21,8 +21,8 @@
                 </li>
                 <li class="nav-item mx-sm-0 mx-lg-2">
                     <div class="d-flex gap-4 mt-lg-0 mt-sm-3">
-                        <a class="btn btn-primary" href="register.html">Daftar</a>
-                        <a class="btn btn-outline-primary" href="login.html">Masuk</a>
+                        <a class="btn btn-primary" href="{{ route("register") }}">Daftar</a>
+                        <a class="btn btn-outline-primary" href="{{ route("login") }}">Masuk</a>
                     </div>
                 </li>
             </ul>
