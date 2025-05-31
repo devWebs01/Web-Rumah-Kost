@@ -24,7 +24,7 @@ $destroy = function (User $user) {
 
 ?>
 
-<x-admin-layout>
+<x-panel-layout>
     <x-slot name="title">Data guest</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
@@ -61,7 +61,7 @@ $destroy = function (User $user) {
                                         <td>
                                             <div class="d-flex gap-3 justify-content-center">
                                                 <a type="button" class="btn btn-warning btn-sm"
-                                                    href="{{ route("guests.edit", ["user" => $user->id]) }}">Edit</a>
+                                                    href="{{ route("guests.edit", ["user" => $user]) }}">Edit</a>
                                                 <button role="button" wire:click="destroy({{ $user }})"
                                                     class="btn btn-danger btn-sm">Hapus</button>
 
@@ -78,4 +78,4 @@ $destroy = function (User $user) {
 
         </div>
     @endvolt
-</x-admin-layout>
+</x-panel-layout>

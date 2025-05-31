@@ -15,6 +15,7 @@ class Identity extends Model
         'whatsapp_number',
         'id_card',
         'address',
+        'user_id',
     ];
 
     public function user(): BelongsTo

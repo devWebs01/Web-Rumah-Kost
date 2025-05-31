@@ -41,7 +41,7 @@ $update = function () {
 
 ?>
 
-<x-admin-layout>
+<x-panel-layout>
     <x-slot name="title">Edit Data</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
@@ -115,4 +115,4 @@ $update = function () {
 
         </div>
     @endvolt
-</x-admin-layout>
+</x-panel-layout>

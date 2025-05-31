@@ -29,7 +29,7 @@ $create = function () {
 
 ?>
 
-<x-admin-layout>
+<x-panel-layout>
     <x-slot name="title">Tambah Data</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
@@ -45,7 +45,6 @@ $create = function () {
 
     </x-slot>
 
-    @include("components.partials.datatable")
     @volt
         <div>
             <div class="card">
@@ -92,7 +91,7 @@ $create = function () {
                                 </div>
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-sm btn-primary">
+                                <button type="submit" class="btn btn-primary">
                                     Submit
                                 </button>
                             </div>
@@ -104,4 +103,4 @@ $create = function () {
 
         </div>
     @endvolt
-</x-admin-layout>
+</x-panel-layout>

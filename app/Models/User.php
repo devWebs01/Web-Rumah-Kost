@@ -45,12 +45,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function boarding_houses(): hasOne
+    public function boarding_house(): hasOne
     {
         return $this->hasOne(BoardingHouse::class, 'owner_id', 'id');
     }
 
-    public function identities(): hasOne
+    public function identity(): hasOne
     {
         return $this->hasOne(Identity::class);
     }

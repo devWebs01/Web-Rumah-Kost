@@ -1,3 +1,3 @@
-<x-admin-layout>
+<x-panel-layout>
 
-</x-admin-layout>
+</x-panel-layout>

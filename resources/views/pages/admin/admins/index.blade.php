@@ -24,7 +24,7 @@ $destroy = function (User $user) {
 
 ?>
 
-<x-admin-layout>
+<x-panel-layout>
     <x-slot name="title">Data Admin</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
@@ -78,4 +78,4 @@ $destroy = function (User $user) {
 
         </div>
     @endvolt
-</x-admin-layout>
+</x-panel-layout>
