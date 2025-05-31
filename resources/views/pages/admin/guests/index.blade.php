@@ -14,14 +14,6 @@ state([
         ->get(),
 ]);
 
-$destroy = function (User $user) {
-    $user->delete();
-
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
-
-    $this->redirectRoute("guests.index");
-};
-
 ?>
 
 <x-panel-layout>
@@ -40,7 +32,6 @@ $destroy = function (User $user) {
         <div>
             <div class="card">
                 <div class="card-body">
-                    <a class="btn btn-primary" href="{{ route("guests.create") }}" role="button">Tambah Data</a>
 
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
@@ -60,10 +51,8 @@ $destroy = function (User $user) {
                                         <td>{{ $user->email }}</td>
                                         <td>
                                             <div class="d-flex gap-3 justify-content-center">
-                                                <a type="button" class="btn btn-warning btn-sm"
-                                                    href="{{ route("guests.edit", ["user" => $user]) }}">Edit</a>
-                                                <button role="button" wire:click="destroy({{ $user }})"
-                                                    class="btn btn-danger btn-sm">Hapus</button>
+                                                <a type="button" class="btn btn-info btn-sm"
+                                                    href="{{ route("guests.edit", ["user" => $user]) }}">Lihat</a>
 
                                             </div>
                                         </td>

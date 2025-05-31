@@ -20,56 +20,6 @@ state([
     "user",
 ]);
 
-$update = function () {
-    $user = $this->user;
-
-    // Validasi data user
-    $validatedUser = $this->validate([
-        "name" => "required|min:5|string|max:100",
-        "email" => "required|email|min:5|max:255|unique:users,email," . $user->id,
-        "password" => "nullable|min:5|string",
-    ]);
-
-    // Jika password diisi, enkripsi, kalau tidak, hapus dari array
-    if (!empty($validatedUser["password"])) {
-        $validatedUser["password"] = bcrypt($validatedUser["password"]);
-    } else {
-        unset($validatedUser["password"]);
-    }
-
-    // Update data user
-    $user->update($validatedUser);
-
-    // Validasi data identitas
-    $validatedIdentity = $this->validate([
-        "phone_number" => "required|digits_between:10,15",
-        "whatsapp_number" => "nullable|digits_between:10,15",
-        "id_card" => "nullable|image|mimes:jpeg,png,jpg|max:2048",
-        "address" => "required|string|min:10|max:255",
-    ]);
-
-    // Update file id_card jika ada yang baru diupload
-    if ($this->id_card) {
-        // Optional: hapus file lama
-        if ($user->identity && $user->identity->id_card) {
-            Storage::delete($user->identity->id_card); // pastikan disk sesuai
-        }
-
-        $validatedIdentity["id_card"] = $this->id_card->store("identities", "public");
-    }
-
-    // Update atau buat relasi identity
-    if ($user->identity) {
-        $user->identity->update($validatedIdentity);
-    } else {
-        $user->identity()->create($validatedIdentity);
-    }
-
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
-
-    $this->redirectRoute("guests.index");
-};
-
 ?>
 
 <x-panel-layout>
@@ -82,7 +32,7 @@ $update = function () {
         </li>
         <li class="breadcrumb-item">
             <a href="#">
-                Edit Data
+                Lihat Data
             </a>
         </li>
 
@@ -95,113 +45,74 @@ $update = function () {
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-body">
-                            <form wire:submit="update">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="name" class="form-label">Nama</label>
-                                            <input type="text" class="form-control" wire:model.blur="name" name="name"
-                                                id="name" aria-describedby="helpId" placeholder="enter name" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="name" class="form-label">Nama</label>
+                                        <input type="text" class="form-control" wire:model.blur="name" name="name"
+                                            id="name" aria-describedby="helpId" placeholder="enter name" readonly />
 
-                                            @error("name")
-                                                <small id="helpId" class="form-text text-danger">
-                                                    {{ $message }}
-                                                </small>
-                                            @enderror
-                                        </div>
+                                        @error("name")
+                                            <small id="helpId" class="form-text text-danger">
+                                                {{ $message }}
+                                            </small>
+                                        @enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="password" class="form-label">Email</label>
-                                            <input type="email" class="form-control" wire:model.blur="email"
-                                                name="email" id="email" aria-describedby="helpId"
-                                                placeholder="enter email" />
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="password" class="form-label">Email</label>
+                                        <input type="email" class="form-control" wire:model.blur="email" name="email"
+                                            id="email" aria-describedby="helpId" placeholder="enter email" readonly />
 
-                                            @error("email")
-                                                <small id="helpId" class="form-text text-danger">
-                                                    {{ $message }}
-                                                </small>
-                                            @enderror
-                                        </div>
+                                        @error("email")
+                                            <small id="helpId" class="form-text text-danger">
+                                                {{ $message }}
+                                            </small>
+                                        @enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="password" class="form-label">Kata Sandi</label>
-                                            <input type="password" class="form-control" wire:model.blur="password"
-                                                name="password" id="password" aria-describedby="helpId"
-                                                placeholder="enter password" />
+                                </div>
 
-                                            @error("password")
-                                                <small id="helpId" class="form-text text-danger">
-                                                    {{ $message }}
-                                                </small>
-                                            @enderror
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="phone_number" class="form-label">
+                                            No. Telephone
+                                        </label>
+                                        <input type="number" class="form-control" wire:model.blur="phone_number"
+                                            name="phone_number" id="phone_number" aria-describedby="helpId"
+                                            placeholder="enter phone_number" readonly />
+
+                                        @error("phone_number")
+                                            <small id="helpId" class="form-text text-danger">
+                                                {{ $message }}
+                                            </small>
+                                        @enderror
                                     </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="whatsapp_number" class="form-label">No. Whatsapp</label>
+                                        <input type="number" class="form-control" wire:model.blur="whatsapp_number"
+                                            name="whatsapp_number" id="whatsapp_number" aria-describedby="helpId"
+                                            placeholder="enter whatsapp_number" readonly />
 
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="phone_number" class="form-label">
-                                                No. Telephone
-                                            </label>
-                                            <input type="number" class="form-control" wire:model.blur="phone_number"
-                                                name="phone_number" id="phone_number" aria-describedby="helpId"
-                                                placeholder="enter phone_number" />
-
-                                            @error("phone_number")
-                                                <small id="helpId" class="form-text text-danger">
-                                                    {{ $message }}
-                                                </small>
-                                            @enderror
-                                        </div>
+                                        @error("whatsapp_number")
+                                            <small id="helpId" class="form-text text-danger">
+                                                {{ $message }}
+                                            </small>
+                                        @enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="whatsapp_number" class="form-label">No. Whatsapp</label>
-                                            <input type="number" class="form-control" wire:model.blur="whatsapp_number"
-                                                name="whatsapp_number" id="whatsapp_number" aria-describedby="helpId"
-                                                placeholder="enter whatsapp_number" />
+                                </div>
 
-                                            @error("whatsapp_number")
-                                                <small id="helpId" class="form-text text-danger">
-                                                    {{ $message }}
-                                                </small>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="id_card" class="form-label">
-                                                Identitas (KTP)
-                                            </label>
-                                            <input type="file" class="form-control" wire:model="id_card" name="id_card"
-                                                id="id_card" aria-describedby="helpId" placeholder="enter id_card"
-                                                accept="image/*" />
-
-                                            @error("id_card")
-                                                <small id="helpId" class="form-text text-danger">
-                                                    {{ $message }}
-                                                </small>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group mb-3">
-                                            <label for="address" class="form-label">Alamat</label>
-                                            <textarea wire:model.blur="address" class="form-control" name="address" id="address" rows="4">
-{{ $address }}
-                                            </textarea>
-                                        </div>
-
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-primary">
-                                            Submit
-                                        </button>
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="address" class="form-label">Alamat</label>
+                                        <textarea wire:model.blur="address" class="form-control" name="address" id="address" rows="4">{{ $address }}</textarea>
                                     </div>
 
                                 </div>
-                            </form>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -238,14 +149,14 @@ $update = function () {
                         <div class="card">
                             <a href="{{ $id_card->temporaryUrl() }}" data-fancybox data-caption="ID Card">
                                 <img src="{{ $id_card->temporaryUrl() }}" class="card-img-top rounded" alt="id card"
-                                    width="150" height="150" style="object-fit: cover;" />
+                                    width="150" height="150" style="object-fit: cover;" readonly />
                             </a>
                         </div>
                     @elseif(!empty($user->identity->id_card))
                         <div class="card">
                             <a href="{{ Storage::url($user->identity->id_card) }}" data-fancybox data-caption="ID Card">
                                 <img src="{{ Storage::url($user->identity->id_card) }}" class="card-img-top rounded"
-                                    alt="id card" width="150" height="150" style="object-fit: cover;" />
+                                    alt="id card" width="150" height="150" style="object-fit: cover;" readonly />
                             </a>
                         </div>
                     @endif
