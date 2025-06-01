@@ -17,9 +17,7 @@ class BoardingHouse extends Model
         'address',
         'owner_id',
         'thumbnail',
-        'category_id',
-        'room_size',
-        'price',
+        'category',
     ];
 
     public function user(): BelongsTo
@@ -27,9 +25,9 @@ class BoardingHouse extends Model
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
 
-    public function category(): BelongsTo
+    public function room(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Room::class);
     }
 
     public function facilities(): HasMany

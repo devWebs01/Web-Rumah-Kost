@@ -40,7 +40,26 @@
                 <span class="hide-menu">Penyewa</span>
             </a>
         </li>
-        
+        <li class="nav-small-cap">
+            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+            <span class="hide-menu">Kost</span>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route("boardingHouse.index") }}" aria-expanded="false">
+                <span>
+                    <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Profil Kost</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route("home") }}" aria-expanded="false">
+                <span>
+                    <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Kamar</span>
+            </a>
+        </li>
     </ul>
     <div class="unlimited-access hide-menu bg-light-primary position-relative mb-7 mt-5 rounded">
         <div class="d-flex">

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      * 'name',
@@ -13,7 +12,7 @@ return new class extends Migration
      * 'address',
      * 'owner_id',
      * 'thumbnail',
-     * 'category_id',
+     * 'category',
      */
     public function up(): void
     {
@@ -24,7 +23,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('thumbnail');
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+            $table->enum('category', ['male', 'female', 'mixed']);
             $table->timestamps();
         });
     }

@@ -45,7 +45,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function boarding_house(): hasOne
+    public function boardingHouse(): hasOne
     {
         return $this->hasOne(BoardingHouse::class, 'owner_id', 'id');
     }

@@ -13,6 +13,8 @@ class Room extends Model
     protected $fillable = [
         'boarding_house_id',
         'room_number',
+        'price',
+        'size',
         'status',
     ];
 

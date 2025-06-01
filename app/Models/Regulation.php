@@ -12,6 +12,7 @@ class Regulation extends Model
 
     protected $fillable = [
         'rule',
+        'boarding_house_id',
     ];
 
     public function boarding_house(): BelongsTo

@@ -44,7 +44,7 @@ $update = function () {
     $validatedIdentity = $this->validate([
         "phone_number" => "required|digits_between:10,15",
         "whatsapp_number" => "nullable|digits_between:10,15",
-        "id_card" => "nullable|image|mimes:jpeg,png,jpg|max:2048",
+        "id_card" => "nullable|image|mimes:jpeg,png,jpg",
         "address" => "required|string|min:10|max:255",
     ]);
 
