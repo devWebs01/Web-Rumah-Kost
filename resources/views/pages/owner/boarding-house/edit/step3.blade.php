@@ -119,7 +119,7 @@
                 <button type="submit" class="btn btn-primary">
                     Submit
                 </button>
-                <div class="spinner-border d-none" wire:loading.class='d-none' wire:target='save' role="status">
+                <div class="spinner-border " wire:loading.class='d-none' wire:target='save' role="status">
                 </div>
             </div>
         </div>

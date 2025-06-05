@@ -18,16 +18,17 @@ class BoardingHouse extends Model
         'owner_id',
         'thumbnail',
         'category',
+        'verification_status',
     ];
 
-    public function user(): BelongsTo
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
 
-    public function room(): BelongsTo
+    public function rooms(): hasMany
     {
-        return $this->belongsTo(Room::class);
+        return $this->hasMany(Room::class);
     }
 
     public function facilities(): HasMany
@@ -38,5 +39,10 @@ class BoardingHouse extends Model
     public function regulations()
     {
         return $this->hasMany(Regulation::class);
+    }
+
+    public function galleries()
+    {
+        return $this->hasMany(Gallery::class);
     }
 }
