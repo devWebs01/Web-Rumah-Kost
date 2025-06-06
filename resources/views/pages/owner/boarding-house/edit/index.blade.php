@@ -41,6 +41,7 @@ $save = function () {
         "address" => "required|string",
         "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
         "category" => "required|in:male,female,mixed",
+        // "verification_status" => "nullable",
     ]);
 
     $validatedBoardingHouse["owner_id"] = Auth::id();
@@ -49,6 +50,11 @@ $save = function () {
         $validatedBoardingHouse["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
     } else {
         $validatedBoardingHouse["thumbnail"] = $this->boardingHouse->thumbnail;
+    }
+
+    if ($this->boardingHouse->verification_status === 'rejected') {
+        # code...
+        $validatedBoardingHouse["verification_status"] = 'pending';
     }
 
     // Jika boardingHouse sudah ada, update
