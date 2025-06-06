@@ -29,6 +29,14 @@ $available = function (Room $room) {
     $this->redirectRoute("boardingHouse.index");
 };
 
+$destroy = function (Room $room) {
+    $room->delete();
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+    $this->redirectRoute("boardingHouse.index");
+};
+
 ?>
 
 @volt
@@ -40,7 +48,7 @@ $available = function (Room $room) {
                 <div class="card border">
                     <h4 class="text-center fw-semibold text-decoration-underline mt-3">Data Kamar</h4>
                     <div class="card-body">
-                        <a class="btn btn-primary mb-3" href="{{ route("admins.create") }}" role="button">Tambah Data</a>
+                        <a class="btn btn-primary mb-3" href="{{ route("rooms.create") }}" role="button">Tambah Data</a>
 
                         <div class="table-responsive">
                             <table class="table table-striped table-bordered">
@@ -69,16 +77,20 @@ $available = function (Room $room) {
                                             <td>
                                                 <div class="d-flex gap-3 justify-content-center">
                                                     @if ($room->status === "available")
-                                                        <button type="button" class="btn btn-dark"
+                                                        <button type="button" class="btn btn-dark btn-sm"
                                                             wire:click='unavailable({{ $room }})'>
                                                             Tidak Tersedia
                                                         </button>
                                                     @else
-                                                        <button type="button" class="btn btn-success"
+                                                        <button type="button" class="btn btn-success btn-sm"
                                                             wire:click='available({{ $room }})'>
                                                             Tersedia
                                                         </button>
                                                     @endif
+                                                    <a class="btn btn-warning btn-sm"
+                                                        href="{{ route("rooms.edit", ["room" => $room->id]) }}"
+                                                        role="button">Edit</a>
+
                                                     <button role="button" wire:click="destroy({{ $room }})"
                                                         class="btn btn-danger btn-sm">Hapus</button>
 

@@ -1,6 +1,6 @@
 <?php
 
-use function Livewire\Volt\{state, on};
+use function Livewire\Volt\{state};
 use function Laravel\Folio\{name};
 
 name("boardingHouse.index");
