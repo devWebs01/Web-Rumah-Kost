@@ -3,6 +3,7 @@
 use App\Models\BoardingHouse;
 use function Livewire\Volt\{state};
 use function Laravel\Folio\{name};
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
 name("boardingHouses.index");
 
@@ -12,14 +13,22 @@ state([
 
 $verified = function (BoardingHouse $boardingHouse) {
     $boardingHouse->update([
-        "status" => "verified",
+        "verification_status" => "verified",
     ]);
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+    $this->redirectRoute("boardingHouses.index");
 };
 
 $rejected = function (BoardingHouse $boardingHouse) {
     $boardingHouse->update([
-        "status" => "rejected",
+        "verification_status" => "rejected",
     ]);
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+    $this->redirectRoute("boardingHouses.index");
 };
 
 ?>
@@ -75,8 +84,25 @@ $rejected = function (BoardingHouse $boardingHouse) {
                                         </td>
                                         <td>
                                             <div class="d-flex gap-3 justify-content-center">
-                                                <a type="button" class="btn btn-primary btn-sm"
-                                                    href="{{ route("boardingHouses.show", ["boardingHouse" => $boardingHouse->id]) }}">Lihat</a>
+                                                @if ($boardingHouse->verification_status === "verified")
+                                                    <!-- Tombol Tolak -->
+                                                    <button type="button" wire:click="rejected({{ $boardingHouse->id }})"
+                                                        class="btn btn-danger btn-sm">
+                                                        Tolak
+                                                    </button>
+                                                @else
+                                                    <!-- Tombol Verifikasi -->
+                                                    <button type="button" wire:click="verified({{ $boardingHouse->id }})"
+                                                        class="btn btn-success btn-sm">
+                                                        Verifikasi
+                                                    </button>
+                                                @endif
+
+                                                <!-- Tombol Lihat -->
+                                                <a href="{{ route("boardingHouses.show", ["boardingHouse" => $boardingHouse->id]) }}"
+                                                    class="btn btn-primary btn-sm">
+                                                    Lihat
+                                                </a>
 
                                             </div>
                                         </td>

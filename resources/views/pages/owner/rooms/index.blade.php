@@ -1,83 +1,99 @@
 <?php
 
-use function Livewire\Volt\{state, on};
-use function Laravel\Folio\{name};
+use function Livewire\Volt\{state};
+use App\Models\{Room};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
-
-name("rooms.index");
-
-state([
-    "step" => 1,
-])->url();
 
 state([
     "user" => Auth::user(),
     "rooms" => fn() => $this->user->boardingHouse->rooms ?? null,
 ]);
 
+$unavailable = function (Room $room) {
+    $room->update([
+        "status" => "unavailable",
+    ]);
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+    $this->redirectRoute("boardingHouse.index");
+};
+
+$available = function (Room $room) {
+    $room->update([
+        "status" => "available",
+    ]);
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+    $this->redirectRoute("boardingHouse.index");
+};
+
 ?>
 
-<x-panel-layout>
-    <x-slot name="title">Profile Kost</x-slot>
-    <x-slot name="header">
-        <li class="breadcrumb-item">
-            <a href="{{ route("boardingHouse.index") }}">Profile Kost</a>
-        </li>
-    </x-slot>
+@volt
+    <div>
+        @include("components.partials.datatable")
 
-    @include("components.partials.tom-select")
+        @if ($rooms)
+            <div>
+                <div class="card border">
+                    <h4 class="text-center fw-semibold text-decoration-underline mt-3">Data Kamar</h4>
+                    <div class="card-body">
+                        <a class="btn btn-primary mb-3" href="{{ route("admins.create") }}" role="button">Tambah Data</a>
 
-    @volt
-        <div>
-
-            @if ($rooms)
-                <div>
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn btn-primary" href="{{ route("admins.create") }}" role="button">Tambah Data</a>
-
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Nomor Kamar</th>
+                                        <th>Nomor Kamar</th>
+                                        <th>Harga</th>
+                                        <th>Status</th>
+                                        <th>Ukuran</th>
+                                        <th>Opsi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($rooms as $no => $room)
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Nomor Kamar</th>
-                                            <th>Harga</th>
-                                            <th>Ukuran</th>
-                                            <th>Status</th>
-                                            <th>Opsi</th>
+                                            <td>{{ ++$no }} </td>
+                                            <td>Kamar {{ $room->room_number }}</td>
+                                            <td>{{ formatRupiah($room->price) }}</td>
+                                            <td>
+                                                <span class="badge bg-primary">
+                                                    {{ __("room_status." . $room->status) }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $room->size }}</td>
+                                            <td>
+                                                <div class="d-flex gap-3 justify-content-center">
+                                                    @if ($room->status === "available")
+                                                        <button type="button" class="btn btn-dark"
+                                                            wire:click='unavailable({{ $room }})'>
+                                                            Tidak Tersedia
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="btn btn-success"
+                                                            wire:click='available({{ $room }})'>
+                                                            Tersedia
+                                                        </button>
+                                                    @endif
+                                                    <button role="button" wire:click="destroy({{ $room }})"
+                                                        class="btn btn-danger btn-sm">Hapus</button>
+
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($rooms as $no => $room)
-                                            <tr>
-                                                <td>{{ ++$no }}</td>
-                                                <td>{{ $room->room_number }}</td>
-                                                <td>{{ $room->price }}</td>
-                                                <td>{{ $room->size }}</td>
-                                                <td>
-                                                    <div class="d-flex gap-3 justify-content-center">
-                                                        {{-- <a type="button" class="btn btn-warning btn-sm"
-                                                            href="{{ route("admins.edit", ["room" => $room->id]) }}">Edit</a> --}}
-                                                        <button role="button" wire:click="destroy({{ $room }})"
-                                                            class="btn btn-danger btn-sm">Hapus</button>
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
+
                     </div>
-
                 </div>
-            @else
-                tidak aada
-            @endif
+            </div>
+        @endif
 
-        </div>
-    @endvolt
-</x-panel-layout>
+    </div>
+@endvolt

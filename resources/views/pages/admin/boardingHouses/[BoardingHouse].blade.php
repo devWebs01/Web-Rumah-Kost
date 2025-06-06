@@ -14,13 +14,19 @@ state(["boardingHouse"]);
     <x-slot name="title">Data Kos</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
-            <a href="#">
+            <a href="{{ route("boardingHouses.index") }}">
                 Kos
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="#">
+                Detail Kos
             </a>
         </li>
 
     </x-slot>
 
+    @include("components.partials.fancybox")
     @volt
         <div>
             <div class="card overflow-hidden">
@@ -57,7 +63,7 @@ state(["boardingHouse"]);
                                 </div>
                                 <div class="text-center">
                                     <h5 class="mb-0 text-capitalize">{{ $boardingHouse->owner->name }}</h5>
-                                    <p class="mb-0">Owner</p>
+                                    <p class="mb-0">Pemilik</p>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +158,7 @@ state(["boardingHouse"]);
                                         @if ($boardingHouse->owner->email)
                                             <div class="hstack gap-6">
                                                 <i class="ti ti-mail text-dark fs-6"></i>
-                                                <h6 class="mb-0">Email Pemilik: {{ $boardingHouse->owner->email }}</h6>
+                                                <h6 class="mb-0">Email: {{ $boardingHouse->owner->email }}</h6>
                                             </div>
                                         @endif
                                     </div>
@@ -161,67 +167,67 @@ state(["boardingHouse"]);
                             </div>
                             <div class="card shadow-none border">
                                 <div class="card-body">
-                                    <h4 class="fw-semibold mb-3">Gallery</h4>
+                                    <h4 class="fw-semibold mb-3">Galleri Kos</h4>
                                     <div class="row">
-                                        @foreach ($boardingHouse->galleries as $gallery)
+                                        @forelse ($boardingHouse->galleries as $gallery)
                                             <div class="col-4">
-                                                <img src="{{ Storage::url($boardingHouse->image) }}" alt="gallery-img"
-                                                    class="rounded-1 img-fluid mb-9">
+                                                <a href="{{ Storage::url($gallery->image) }}" data-fancybox="gallery">
+                                                    <img src="{{ Storage::url($gallery->image) }}" alt="gallery-img"
+                                                        class="rounded-1 img-fluid mb-9">
+                                                </a>
                                             </div>
-                                        @endforeach
+                                        @empty
+                                            @for ($i = 0; $i < 3; $i++)
+                                                <div class="col-4">
+                                                    <a href="https://dummyimage.com/1200x800/000/bfbfbf&text=no+image"
+                                                        data-fancybox="gallery">
+                                                        <img src="https://dummyimage.com/600x400/000/bfbfbf&text=no+image"
+                                                            alt="gallery-img" class="rounded-1 img-fluid mb-9">
+                                                    </a>
+                                                </div>
+                                            @endfor
+                                        @endforelse
 
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-8">
-                            <div class="card shadow-none border">
+                            <div class="card shadow-sm border">
                                 <div class="card-body">
-                                    <h4 class="mb-3">Share Your Thoughts</h4>
-                                    <div class="form-floating mb-3">
-                                        <textarea class="form-control h-140" placeholder="Leave a comment here" id="floatingTextarea2"></textarea>
-                                        <label for="floatingTextarea2">Your Comment</label>
-                                    </div>
-                                    <button class="btn btn-primary">Post</button>
+                                    <h4 class="mb-3 text-dark">📋 Informasi Fasilitas dan Peraturan Kos</h4>
+
+                                    <p class="mb-2">
+                                        Berikut adalah rincian lengkap fasilitas yang tersedia di
+                                        <strong class="text-primary">{{ $boardingHouse->name }}</strong> untuk kenyamanan
+                                        penghuni:
+                                    </p>
+                                    <ul class="mb-4 ps-3">
+                                        @forelse ($boardingHouse->facilities as $facility)
+                                            <li class="mb-1">✅ {{ $facility->name }}</li>
+                                        @empty
+                                            <li class="text-muted">Belum ada data fasilitas yang ditambahkan.</li>
+                                        @endforelse
+                                    </ul>
+
+                                    <p class="mb-2">
+                                        Untuk menjaga ketertiban dan kenyamanan bersama, berikut adalah peraturan yang
+                                        berlaku di
+                                        <strong class="text-primary">{{ $boardingHouse->name }}</strong>:
+                                    </p>
+                                    <ul class="ps-3">
+                                        @forelse ($boardingHouse->regulations as $regulation)
+                                            <li class="mb-1">⚠️
+                                                {{ ucwords(str_replace("-", " ", $regulation->rule)) }}
+
+                                            </li>
+                                        @empty
+                                            <li class="text-muted">Belum ada data peraturan yang ditambahkan.</li>
+                                        @endforelse
+                                    </ul>
                                 </div>
                             </div>
-                            <div class="card">
-                                <div class="card-body border-bottom">
-                                    <div class="d-flex align-items-center gap-6 flex-wrap">
-                                        <img src="../assets/images/profile/user-1.jpg" alt="user-img"
-                                            class="rounded-circle" width="40" height="40">
-                                        <h6 class="mb-0">User Name</h6>
-                                        <span class="fs-2 hstack gap-2">
-                                            <span class="round-10 text-bg-light rounded-circle d-inline-block"></span>
-                                            15 min ago
-                                        </span>
-                                    </div>
-                                    <p class="text-dark my-3">This is a comment about the boarding house.</p>
-                                    <div class="d-flex align-items-center my-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <a class="round-32 rounded-circle btn btn-primary p-0 hstack justify-content-center"
-                                                href="javascript:void(0)" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Like">
-                                                <i class="ti ti-thumb-up"></i>
-                                            </a>
-                                            <span class="text-dark fw-semibold">67</span>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2 ms-4">
-                                            <a class="round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center"
-                                                href="javascript:void(0)" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Comment">
-                                                <i class="ti ti-message-2"></i>
-                                            </a>
-                                            <span class="text-dark fw-semibold">2</span>
-                                        </div>
-                                        <a class="text-dark ms-auto d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle"
-                                            href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            data-bs-title="Share">
-                                            <i class="ti ti-share"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -245,7 +251,7 @@ state(["boardingHouse"]);
                                             </span>
                                         </div>
                                         <button class="btn btn-outline-primary py-1 px-2 ms-auto">
-                                            {{ $room->status }}
+                                            {{ __("room_status." . $room->status) }}
                                         </button>
                                     </div>
                                 </div>

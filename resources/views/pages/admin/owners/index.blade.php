@@ -22,6 +22,7 @@ $destroy = function (User $user) {
     $this->redirectRoute("owners.index");
 };
 
+
 ?>
 
 <x-panel-layout>

@@ -2,7 +2,6 @@
 
 use function Livewire\Volt\{state, on};
 use function Laravel\Folio\{name};
-use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
 name("boardingHouse.index");
 
@@ -30,6 +29,27 @@ state([
     @volt
         <div>
 
+            @if ($boardingHouse->verification_status === "rejected")
+                <div class="alert alert-danger d-flex align-items-center gap-3 p-3 rounded-2">
+                    <i class="ti ti-x-circle fs-4 text-danger"></i>
+                    <div>
+                        <strong>Pengajuan Ditolak</strong><br>
+                        Maaf, pengajuan data kos <strong>{{ $boardingHouse->name }}</strong> telah ditolak oleh admin.
+                        Silakan periksa kembali data yang diisi atau hubungi pihak admin untuk informasi lebih lanjut.
+                    </div>
+                </div>
+            @elseif ($boardingHouse->verification_status === "pending")
+                <div class="alert alert-warning d-flex align-items-center gap-3 p-3 rounded-2">
+                    <i class="ti ti-alert-triangle fs-4 text-warning"></i>
+                    <div>
+                        <strong>Menunggu Verifikasi</strong><br>
+                        Data kos <strong>{{ $boardingHouse->name }}</strong> saat ini sedang dalam proses verifikasi oleh
+                        admin.
+                        Harap bersabar, Anda akan diberi notifikasi saat proses selesai.
+                    </div>
+                </div>
+            @endif
+
             {{-- Notifikasi jika belum ada data kos --}}
             @if (!empty($boardingHouse))
                 <div class="card w-100 bg-primary-subtle overflow-hidden border mb-4">
@@ -38,8 +58,7 @@ state([
                             <div class="col-sm-7">
                                 <div class="d-flex align-items-center mb-3">
                                     <h5 class="fw-semibold text-primary mb-0 fs-5">
-                                        Kos
-                                        {{ $boardingHouse->category }}
+                                        {{ __("category." . $boardingHouse->category) }}
                                     </h5>
                                 </div>
                                 <div class="mb-2">
@@ -52,8 +71,9 @@ state([
                                 </div>
                                 <div class="mb-2">
                                     <p class="mb-0">
-                                        <span
-                                            class="badge bg-primary">{{ $boardingHouse->status ?? "Menunggu Verifikasi" }}</span>
+                                        <span class="badge bg-primary">
+                                            {{ __("verification_status." . $boardingHouse->verification_status) }}
+                                        </span>
                                     </p>
                                 </div>
                                 <!-- Tambahkan informasi lainnya sesuai kebutuhan -->
@@ -78,6 +98,8 @@ state([
 
                 @include("pages.owner.boarding-house.create.index")
             @endif
+
+            @include("pages.owner.rooms.index")
 
         </div>
     @endvolt
