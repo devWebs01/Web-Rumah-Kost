@@ -62,6 +62,13 @@ state([
                                     </h5>
                                 </div>
                                 <div class="mb-2">
+                                    <p class="mb-0">
+                                        <span class="badge bg-primary">
+                                            {{ __("verification_status." . $boardingHouse->verification_status) }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="mb-2">
                                     <h4 class="mb-0 fw-bolder">{{ $boardingHouse->name }}</h4>
                                 </div>
                                 <div class="mb-2">
@@ -69,12 +76,11 @@ state([
                                         {{ $boardingHouse->address }}
                                     </p>
                                 </div>
+
                                 <div class="mb-2">
-                                    <p class="mb-0">
-                                        <span class="badge bg-primary">
-                                            {{ __("verification_status." . $boardingHouse->verification_status) }}
-                                        </span>
-                                    </p>
+                                    <a class="btn btn-warning" href="{{ route("boardingHouse.edit") }}" role="button">Edit
+                                        Data</a>
+
                                 </div>
                                 <!-- Tambahkan informasi lainnya sesuai kebutuhan -->
                             </div>
