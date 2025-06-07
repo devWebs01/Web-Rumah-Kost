@@ -8,6 +8,8 @@
         <link rel="shortcut icon" type="image/png" href="{{ asset("be-assets/images/logos/favicon.png") }}" />
         <link rel="stylesheet" href="{{ asset("be-assets/css/styles.min.css") }}" />
 
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
         @stack("styles")
 
         <style>

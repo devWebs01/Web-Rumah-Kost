@@ -49,10 +49,9 @@ $rejected = function (BoardingHouse $boardingHouse) {
         <div>
             <div class="card">
                 <div class="card-body">
-                    <a class="btn btn-primary" href="{{ route("admins.create") }}" role="button">Tambah Data</a>
 
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered">
+                        <table class="table table-striped table-bordered text-nowrap">
                             <thead>
                                 <tr>
                                     <th>No.</th>
@@ -69,7 +68,7 @@ $rejected = function (BoardingHouse $boardingHouse) {
                                         <td>{{ ++$no }}</td>
                                         <td>
                                             <img src="{{ Storage::url($boardingHouse->thumbnail) }}"
-                                                class="img-fluid rounded object-fit-cover" width="80px" height="80px"
+                                                class="img-fluid rounded object-fit-cover" width="50px" height="50px"
                                                 alt="thumbnail" />
                                         </td>
                                         <td>{{ $boardingHouse->name }}</td>
@@ -84,25 +83,23 @@ $rejected = function (BoardingHouse $boardingHouse) {
                                         </td>
                                         <td>
                                             <div class="d-flex gap-3 justify-content-center">
-                                                @if ($boardingHouse->verification_status === "verified")
-                                                    <!-- Tombol Tolak -->
-                                                    <button type="button" wire:click="rejected({{ $boardingHouse->id }})"
-                                                        class="btn btn-danger btn-sm">
-                                                        Tolak
-                                                    </button>
-                                                @else
-                                                    <!-- Tombol Verifikasi -->
-                                                    <button type="button" wire:click="verified({{ $boardingHouse->id }})"
-                                                        class="btn btn-success btn-sm">
-                                                        Verifikasi
-                                                    </button>
-                                                @endif
+                                                <!-- Tombol Verifikasi: tampilkan saat status ≠ 'verified' -->
+                                                <button type="button" wire:click="verified({{ $boardingHouse->id }})"
+                                                    class="btn btn-success btn-sm {{ $boardingHouse->verification_status === "verified" ? "d-none" : "" }}">
+                                                    Verifikasi
+                                                </button>
 
-                                                <!-- Tombol Lihat -->
+                                                <!-- Tombol Lihat (selalu tampil) -->
                                                 <a href="{{ route("boardingHouses.show", ["boardingHouse" => $boardingHouse->id]) }}"
                                                     class="btn btn-primary btn-sm">
                                                     Lihat
                                                 </a>
+
+                                                <!-- Tombol Tolak: tampilkan saat status ≠ 'rejected' -->
+                                                <button type="button" wire:click="rejected({{ $boardingHouse->id }})"
+                                                    class="btn btn-danger btn-sm {{ $boardingHouse->verification_status === "rejected" ? "d-none" : "" }}">
+                                                    Tolak
+                                                </button>
 
                                             </div>
                                         </td>

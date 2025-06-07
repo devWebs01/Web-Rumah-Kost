@@ -43,6 +43,8 @@ state([
 
     //
     "rooms" => [],
+    "galleries" => [],
+    "prevgalleries",
 ]);
 
 on([
@@ -79,6 +81,24 @@ $prevBtn = function () {
 $nextBtn = function () {
     $this->step++;
     $this->dispatch("nextBtn_updated");
+};
+
+$updatingGalleries = function ($value) {
+    $this->prevgalleries = $this->galleries;
+};
+
+$updatedGalleries = function ($value) {
+    $this->galleries = array_merge($this->prevgalleries, $value);
+};
+
+$removeItem = function ($key) {
+    if (isset($this->galleries[$key])) {
+        $file = $this->galleries[$key];
+        $file->delete();
+        unset($this->galleries[$key]);
+    }
+
+    $this->galleries = array_values($this->galleries);
 };
 
 $save = function () {
@@ -150,7 +170,7 @@ $save = function () {
         ]);
     }
 
-    $validatedregulation = $this->validate([
+    $validatedRegulation = $this->validate([
         "regulations" => "required",
         "regulations.*" => "required|string|min:2",
     ]);
@@ -158,6 +178,19 @@ $save = function () {
     foreach ($this->regulations as $regulation) {
         $boardingHouse->regulations()->create([
             "rule" => $regulation,
+        ]);
+    }
+
+    $validatedGalleries = $this->validate([
+        "galleries" => "required",
+        "galleries.*" => "required|image",
+    ]);
+
+    foreach ($this->galleries as $gallery) {
+        $path = $gallery->store("galleries", "public");
+
+        $boardingHouse->galleries()->create([
+            "image" => $path,
         ]);
     }
 

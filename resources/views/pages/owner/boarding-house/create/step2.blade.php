@@ -1,3 +1,5 @@
+@include("components.partials.dropzone")
+
 <div class="carousel-item {{ $step === 2 ? "active" : "" }}">
     <div class="card border rounded" style="min-height: 400px;">
         <div class="card-body bg-white">
@@ -36,7 +38,7 @@
                         </div>
 
                         {{-- Jumlah --}}
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md mb-3">
                             <label class="form-label">Jumlah Kamar</label>
                             <input type="number" class="form-control" wire:model="total_rooms" placeholder="Cth: 10">
                             @error("total_rooms")
@@ -112,6 +114,45 @@
                             @endforeach
                         </form>
                     </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">
+                        Gambar Kamar
+                        <span wire:target='galleries' wire:loading.class.remove="d-none"
+                            class="d-none spinner-border spinner-border-sm" role="status">
+                        </span>
+                    </label>
+                    <div class="mb-3">
+                        <label id="dropZone" for="galleries" class="form-label">Gambar Kamar</label>
+                        <input type="file" class="d-none form-control @error("galleries") is-invalid @enderror"
+                            wire:model="galleries" id="galleries" aria-describedby="galleriesId"
+                            autocomplete="galleries" accept="image/*" multiple />
+                        @error("galleries")
+                            <small id="galleriesId" class="form-text text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    @if ($galleries)
+                        <div class="mb-5">
+                            <div class="d-flex flex-nowrap gap-3 overflow-auto" style="white-space: nowrap;">
+                                @foreach ($galleries as $key => $gallery)
+                                    <div class="position-relative" style="width: 200px; flex: 0 0 auto;">
+                                        <div class="card mt-3">
+                                            <img src="{{ $gallery->temporaryUrl() }}" class="card-img-top"
+                                                style="object-fit: cover; width: 200px; height: 200px;"
+                                                alt="preview">
+                                            <a type="button"
+                                                class="position-absolute top-0 start-100 translate-middle p-2"
+                                                wire:click.prevent='removeItem({{ json_encode($key) }})'>
+                                                <i class='bx bx-x p-2 rounded-circle ri-20px text-white bg-danger'></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             </div>

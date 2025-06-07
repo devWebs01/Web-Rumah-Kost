@@ -28,30 +28,30 @@ state([
 
     @volt
         <div>
-
-            @if ($boardingHouse->verification_status === "rejected")
-                <div class="alert alert-danger d-flex align-items-center gap-3 p-3 rounded-2">
-                    <i class="ti ti-x-circle fs-4 text-danger"></i>
-                    <div>
-                        <strong>Pengajuan Ditolak</strong><br>
-                        Maaf, pengajuan data kos <strong>{{ $boardingHouse->name }}</strong> telah ditolak oleh admin.
-                        Silakan periksa kembali data yang diisi atau hubungi pihak admin untuk informasi lebih lanjut.
-                    </div>
-                </div>
-            @elseif ($boardingHouse->verification_status === "pending")
-                <div class="alert alert-warning d-flex align-items-center gap-3 p-3 rounded-2">
-                    <i class="ti ti-alert-triangle fs-4 text-warning"></i>
-                    <div>
-                        <strong>Menunggu Verifikasi</strong><br>
-                        Data kos <strong>{{ $boardingHouse->name }}</strong> saat ini sedang dalam proses verifikasi oleh
-                        admin.
-                        Harap bersabar, Anda akan diberi notifikasi saat proses selesai.
-                    </div>
-                </div>
-            @endif
-
             {{-- Notifikasi jika belum ada data kos --}}
             @if (!empty($boardingHouse))
+                @if ($boardingHouse->verification_status === "rejected")
+                    <div class="alert alert-danger d-flex align-items-center gap-3 p-3 rounded-2">
+                        <i class="ti ti-x-circle fs-4 text-danger"></i>
+                        <div>
+                            <strong>Pengajuan Ditolak</strong><br>
+                            Maaf, pengajuan data kos <strong>{{ $boardingHouse->name }}</strong> telah ditolak oleh admin.
+                            Silakan periksa kembali data yang diisi atau hubungi pihak admin untuk informasi lebih lanjut.
+                        </div>
+                    </div>
+                @elseif ($boardingHouse->verification_status === "pending")
+                    <div class="alert alert-warning d-flex align-items-center gap-3 p-3 rounded-2">
+                        <i class="ti ti-alert-triangle fs-4 text-warning"></i>
+                        <div>
+                            <strong>Menunggu Verifikasi</strong><br>
+                            Data kos <strong>{{ $boardingHouse->name }}</strong> saat ini sedang dalam proses verifikasi
+                            oleh
+                            admin.
+                            Harap bersabar, Anda akan diberi notifikasi saat proses selesai.
+                        </div>
+                    </div>
+                @endif
+
                 <div class="card w-100 bg-primary-subtle overflow-hidden border mb-4">
                     <div class="card-body bg-white position-relative">
                         <div class="row">

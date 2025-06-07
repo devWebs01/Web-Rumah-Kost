@@ -167,13 +167,15 @@ state(["boardingHouse"]);
                             </div>
                             <div class="card shadow-none border">
                                 <div class="card-body">
-                                    <h4 class="fw-semibold mb-3">Galleri Kos</h4>
+                                    <h4 class="fw-semibold mb-3">Galeri Kos</h4>
                                     <div class="row">
                                         @forelse ($boardingHouse->galleries as $gallery)
                                             <div class="col-4">
                                                 <a href="{{ Storage::url($gallery->image) }}" data-fancybox="gallery">
+
                                                     <img src="{{ Storage::url($gallery->image) }}" alt="gallery-img"
-                                                        class="rounded-1 img-fluid mb-9">
+                                                        class="img object-fit-cover mb-3 rounded"
+                                                        style="width: 80px; height: 80px;">
                                                 </a>
                                             </div>
                                         @empty

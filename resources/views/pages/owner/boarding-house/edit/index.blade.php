@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\{BoardingHouse, Room};
+use App\Models\{BoardingHouse, Room, Gallery};
 use function Livewire\Volt\{state, on, usesFileUploads};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use function Laravel\Folio\{name};
@@ -31,7 +31,28 @@ state([
     // Fasilitas & aturan
     "facilities" => fn() => $this->boardingHouse?->facilities->pluck("name")->toArray(),
     "regulations" => fn() => $this->boardingHouse?->regulations->pluck("rule")->toArray(),
+
+    "galleries" => [],
+    "prevgalleries",
 ]);
+
+$updatingGalleries = function ($value) {
+    $this->prevgalleries = $this->galleries;
+};
+
+$updatedGalleries = function ($value) {
+    $this->galleries = array_merge($this->prevgalleries, $value);
+};
+
+$removeItem = function ($key) {
+    if (isset($this->galleries[$key])) {
+        $file = $this->galleries[$key];
+        $file->delete();
+        unset($this->galleries[$key]);
+    }
+
+    $this->galleries = array_values($this->galleries);
+};
 
 $save = function () {
     // Validasi data boarding house
@@ -52,9 +73,9 @@ $save = function () {
         $validatedBoardingHouse["thumbnail"] = $this->boardingHouse->thumbnail;
     }
 
-    if ($this->boardingHouse->verification_status === 'rejected') {
+    if ($this->boardingHouse->verification_status === "rejected") {
         # code...
-        $validatedBoardingHouse["verification_status"] = 'pending';
+        $validatedBoardingHouse["verification_status"] = "pending";
     }
 
     // Jika boardingHouse sudah ada, update
@@ -83,6 +104,34 @@ $save = function () {
         ]);
     }
 
+    // update gambar
+    if (count($this->galleries) > 0) {
+        $validatedGalleries = $this->validate([
+            "galleries" => "required",
+            "galleries.*" => "required|image",
+        ]);
+
+        $galleries = $this->boardingHouse->galleries;
+
+        if ($galleries->isNotEmpty()) {
+            foreach ($galleries as $gallery) {
+                Storage::delete($gallery->image);
+
+                $gallery->delete();
+            }
+        }
+
+        foreach ($this->galleries as $gallery) {
+            $path = $gallery->store("galleries", "public");
+
+            $boardingHouse->galleries()->create([
+                "image" => $path,
+            ]);
+
+            $gallery->delete();
+        }
+    }
+
     // Flash alert sukses
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
 
@@ -95,6 +144,7 @@ $save = function () {
     @volt
         <div>
             @include("components.partials.tom-select")
+            @include("components.partials.dropzone")
 
             <form wire:submit='save'>
                 <div class="card border rounded">
@@ -173,7 +223,7 @@ $save = function () {
                             </div>
 
                             {{-- Aturan --}}
-                            <div class="col-12 mt-3">
+                            <div class="col-12 mb-3">
                                 <label for="regulation" class="form-label">Aturan Kost</label>
                                 <div wire:ignore>
                                     <select wire:model='regulations' multiple name="regulation" id="input-tags">
@@ -267,6 +317,67 @@ $save = function () {
                                 @error("regulations.*")
                                     <small id="regulationsId" class="form-text text-danger">{{ $message }}</small>
                                 @enderror
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    Gambar Kamar
+                                    <span wire:target='galleries' wire:loading.class.remove="d-none"
+                                        class="d-none spinner-border spinner-border-sm" role="status">
+                                    </span>
+                                </label>
+                                <div class="mb-3">
+                                    <label id="dropZone" for="galleries" class="form-label">Gambar Kamar</label>
+                                    <input type="file"
+                                        class="d-none form-control @error("galleries") is-invalid @enderror"
+                                        wire:model="galleries" id="galleries" aria-describedby="galleriesId"
+                                        autocomplete="galleries" accept="image/*" multiple />
+                                    @error("galleries")
+                                        <small id="galleriesId" class="form-text text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                @if ($galleries)
+                                    <div class="mb-5">
+                                        <div class="d-flex flex-nowrap gap-3 overflow-auto" style="white-space: nowrap;">
+                                            @foreach ($galleries as $key => $gallery)
+                                                <div class="position-relative" style="width: 200px; flex: 0 0 auto;">
+                                                    <div class="card mt-3">
+                                                        <img src="{{ $gallery->temporaryUrl() }}" class="card-img-top"
+                                                            style="object-fit: cover; width: 200px; height: 200px;"
+                                                            alt="preview">
+                                                        <a type="button"
+                                                            class="position-absolute top-0 start-100 translate-middle p-2"
+                                                            wire:click.prevent='removeItem({{ json_encode($key) }})'>
+                                                            <i
+                                                                class='bx bx-x p-2 rounded-circle ri-20px text-white bg-danger'></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @elseif ($boardingHouse->galleries)
+                                    <div class="mb-5">
+                                        <small>Gambar tersimpan
+                                            <span class="text-danger">(Jika tidak mengubah gambar, tidak perlu melakukan
+                                                input gambar)</span>
+                                            .
+                                        </small>
+                                        <div class="d-flex flex-nowrap gap-3 overflow-auto" style="white-space: nowrap;">
+                                            @foreach ($boardingHouse->galleries as $key => $gallery)
+                                                <div class="position-relative" style="width: 200px; flex: 0 0 auto;">
+                                                    <div class="card mt-3">
+                                                        <img src="{{ Storage::url($gallery->image) }}"
+                                                            class="card-img-top"
+                                                            style="object-fit: cover; width: 200px; height: 200px;"
+                                                            alt="preview">
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
 
                             <div class="col-12 d-flex justify-content-between">

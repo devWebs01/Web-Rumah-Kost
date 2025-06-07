@@ -23,5 +23,13 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test Admin',
             'email' => 'admin@testing.com',
         ]);
+
+        
+
+        // Jika Anda ingin membuat user, boarding house, dll. secara berurutan:
+        $this->call([
+                // UserSeeder::class, // (jika Anda punya seeder khusus untuk user)
+            BoardingHouseSeeder::class,
+        ]);
     }
 }
