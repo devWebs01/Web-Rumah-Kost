@@ -24,22 +24,93 @@ state([
             "terisi" => $kos->rooms->where("status", "!=", "available")->count(),
         ];
     }),
+    "kosByGender" => fn() => [
+        "Laki-laki" => BoardingHouse::where("category", "male")->count(),
+        "Perempuan" => BoardingHouse::where("category", "female")->count(),
+        "Campuran" => BoardingHouse::where("category", "mixed")->count(),
+    ],
+    "boardingHousePending" => fn() => BoardingHouse::where("verification_status", "pending")->get(),
 ]);
 
 ?>
 
 <x-panel-layout>
     <x-slot name="title">Dashboard</x-slot>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @include("components.partials.datatable")
 
     @volt
         <div>
-            <div class="container py-4">
+            <div class=" py-4">
                 @if (Auth::User()->role === "admin")
-                    <div class="p-4">
-                        <h4>Total Kos Terdaftar: {{ $totalKos }}</h4>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card border">
+                                <div class="card-body">
+                                    <div class="p-0">
+                                        <h4 class="text-center fw-semibold">Total Kos Terdaftar: {{ $totalKos }}</h4>
 
-                        <div class="mt-4">
-                            <canvas id="registrationChart"></canvas>
+                                        <div class="mt-4">
+                                            <canvas id="registrationChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border">
+                                <div class="card-body">
+                                    <div class="mt-8">
+                                        <h4 class="text-center fw-semibold">Distribusi Gender Kos</h4>
+                                        <canvas id="genderDonutChart" class="mt-4"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border">
+                        <h4 class="text-center fw-semibold">Daftar Kos Butuh Verifikasi!</h4>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Thumbnail</th>
+                                            <th>Nama Kos</th>
+                                            <th>Kategori</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($boardingHousePending as $no => $pending)
+                                            <tr>
+                                                <td>{{ ++$no }}</td>
+                                                <td>
+                                                    <img src="{{ Storage::url($pending->thumbnail) }}"
+                                                        class="img-fluid rounded object-fit-cover" width="50px"
+                                                        height="50px" alt="thumbnail" />
+                                                </td>
+                                                <td>{{ $pending->name }}</td>
+                                                <td>
+                                                    {{ __("category." . $pending->category) }}
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">
+                                                        {{ __("verification_status." . $pending->verification_status) }}
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                     </div>
 
@@ -59,6 +130,32 @@ state([
                                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                                     tension: 0.4
                                 }]
+                            }
+                        });
+                    </script>
+                    <script>
+                        const kosByGender = @json($kosByGender);
+                        const genderLabels = Object.keys(kosByGender);
+                        const genderCounts = Object.values(kosByGender);
+
+                        new Chart(document.getElementById('genderDonutChart'), {
+                            type: 'doughnut',
+                            data: {
+                                labels: genderLabels,
+                                datasets: [{
+                                    label: 'Jenis Kos',
+                                    data: genderCounts,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                cutout: '60%', // agar jadi donat
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
                             }
                         });
                     </script>
