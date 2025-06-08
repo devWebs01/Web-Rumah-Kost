@@ -853,7 +853,7 @@
         <!-- Navigation -->
         <x-guest-nav></x-guest-nav>
 
-        <main class="pt-5">
+        <main class="py-5">
             {{ $slot }}
         </main>
 

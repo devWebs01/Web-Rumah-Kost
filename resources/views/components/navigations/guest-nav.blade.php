@@ -32,22 +32,26 @@ $logout = function () {
                             <a class="nav-link " href="#">Kontak</a>
                         </li>
 
-                        @auth
-                            @if (Auth::user()->role === "admin")
-                                <a class="btn btn-outline-primary" href="{{ route("home") }}">Dashboard</a>
-                            @elseif (Auth::user()->role === "owner")
-                                <a class="btn btn-outline-primary" href="{{ route("home") }}">Dashboard</a>
+                        <li class="nav-item mx-sm-0 mx-lg-2">
+                            @auth
+                                @if (Auth::user()->role === "admin")
+                                    <a class="btn btn-outline-primary" href="{{ route("home") }}">Dashboard</a>
+                                @elseif (Auth::user()->role === "owner")
+                                    <a class="btn btn-outline-primary" href="{{ route("home") }}">Dashboard</a>
+                                @else
+                                    <div class="d-flex gap-4 mt-lg-0 mt-sm-3">
+
+                                        <a class="btn btn-outline-primary" href="{{ route("profile.guest") }}">Data Profil</a>
+                                        <a class="btn btn-outline-primary" wire:click="logout" href="#">Keluar</a>
+                                    </div>
+                                @endif
                             @else
-                                <a class="btn btn-outline-primary" wire:click="logout" href="#">Keluar</a>
-                            @endif
-                        @else
-                            <li class="nav-item mx-sm-0 mx-lg-2">
                                 <div class="d-flex gap-4 mt-lg-0 mt-sm-3">
                                     <a class="btn btn-primary" href="{{ route("register") }}">Daftar</a>
                                     <a class="btn btn-outline-primary" href="{{ route("login") }}">Masuk</a>
                                 </div>
-                            </li>
-                        @endauth
+                            @endauth
+                        </li>
                     </ul>
                 </div>
             </div>

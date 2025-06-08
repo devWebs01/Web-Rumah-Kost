@@ -17,14 +17,14 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'role' => 'guest',
         ]);
 
         \App\Models\User::factory()->create([
             'name' => 'Test Admin',
             'email' => 'admin@testing.com',
+            'role' => 'admin',
         ]);
-
-        
 
         // Jika Anda ingin membuat user, boarding house, dll. secara berurutan:
         $this->call([

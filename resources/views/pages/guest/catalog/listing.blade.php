@@ -170,7 +170,7 @@ $boardingHouses = computed(function () {
                                                     bulan</h5>
                                             </div>
                                             <a href="{{ route("catalog.show", ["boardingHouse" => $item]) }}"
-                                                class="btn btn-outline-primary stretched-link mt-3">
+                                                class="btn btn-primary fw-bold stretched-link mt-3">
                                                 Lihat
                                                 Detail
                                             </a>

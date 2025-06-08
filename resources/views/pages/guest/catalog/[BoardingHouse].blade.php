@@ -25,6 +25,14 @@ state(["boardingHouse"]);
 
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">{{ __("category." . $boardingHouse->category) }}</span>
+                            <span
+                                class="badge {{ $boardingHouse->verification_status === "verified" ? "bg-primary" : "bg-warning text-dark" }}">
+                                {{ __("verification_status." . $boardingHouse->verification_status) }}
+                            </span>
+                        </div>
+
                         <h2 class="fw-bold mb-2">{{ $boardingHouse->name }}</h2>
                         <p class="text-muted mb-2">
                             <i class="bi bi-geo-alt me-1 text-danger"></i>{{ $boardingHouse->address }}
@@ -42,21 +50,16 @@ state(["boardingHouse"]);
                             </p>
                         @endif
 
-                        <div class="mb-3">
-                            <span class="badge bg-success me-2">{{ __("category." . $boardingHouse->category) }}</span>
-                            <span
-                                class="badge {{ $boardingHouse->verification_status === "verified" ? "bg-primary" : "bg-warning text-dark" }}">
-                                {{ __("verification_status." . $boardingHouse->verification_status) }}
-                            </span>
-                        </div>
-
                         <div class="mb-2">
                             <h6 class="fw-semibold mb-1">Pemilik</h6>
                             <p class="mb-0">{{ $boardingHouse->owner->name ?? "Tidak diketahui" }}</p>
                         </div>
 
-                        <div class="mt-4">
-                            <a href="#rooms" class="btn btn-outline-primary w-100">
+                        <div class="mt-4 d-flex gap-3">
+                            <a href="https://wa.me/{{ $boardingHouse->owner->whatsapp_number }}" class="btn btn-dark w-100">
+                                <i class="fas fa-bed me-1"></i> Hubungi Pemilik
+                            </a>
+                            <a href="#rooms" class="btn btn-secondary w-100">
                                 <i class="fas fa-bed me-1"></i> Lihat Kamar
                             </a>
                         </div>
@@ -70,7 +73,7 @@ state(["boardingHouse"]);
                 <h4 class="fw-bold mb-3">Fasilitas Kos</h4>
                 <div class="bg-light rounded-4 p-4 shadow-sm">
                     @forelse($boardingHouse->facilities as $facility)
-                        <span class="badge bg-primary me-2 p-2">{{ $facility->name }}</span>
+                        <span class="badge bg-primary me-2 mb-3 mb-md-0 p-2">{{ $facility->name }}</span>
                     @empty
                         <p class="text-muted">Tidak ada fasilitas tersedia.</p>
                     @endforelse
@@ -102,7 +105,7 @@ state(["boardingHouse"]);
                                     <a href="{{ Storage::url($gallery->image) }}" data-fancybox="gallery"
                                         data-caption="Foto Galeri">
                                         <img src="{{ Storage::url($gallery->image) }}" class="img-fluid rounded-4"
-                                            alt="Foto Galeri" style="object-fit: cover; height: 180px;">
+                                            alt="Foto Galeri" style="object-fit: cover; height: 180px; width: 100%;">
                                     </a>
                                 </div>
                             </div>
@@ -128,10 +131,10 @@ state(["boardingHouse"]);
                             <div>
                                 <p class="fw-bold fs-5 text-primary">{{ formatRupiah($room->price) }}/bulan</p>
                                 <!-- WhatsApp Link -->
-                                @if ($room->status === "available")
+                                @if ($room->status === "available" && Auth::check())
                                     <div class="mt-3">
-                                        <a href="https://wa.me/{{ $boardingHouse->owner->phone_number }}?text=Halo%2C%20saya%20ingin%20memesan%20kamar%20kos%20dengan%20detail%20sebagai%20berikut%3A%0A%0A%2A%2A%2A%20Kamar%20Kos%20Detail%20%2A%2A%2A%0A%0A%2D%20*Kamar%20No*:%20No.%20{{ $room->room_number }}%0A%2D%20*Ukuran*: {{ $room->size }}m%5E2%0A%2D%20*Harga*: {{ formatRupiah($room->price) }}%2Fbulan%0A%2D%20*Status*: {{ __("room_status." . $room->status) }}%0A%0A%2A%2A%2A%20Detail%20Pengguna%20%2A%2A%2A%0A%0A%2D%20*Nama*: {{ auth()->user()->name }}%0A%2D%20*Email*: {{ auth()->user()->email }}%0A%2D%20*Nomor%20Telepon*: {{ auth()->user()->phone_number }}%0A%2D%20*Alamat*: {{ auth()->user()->address ?? "Tidak tersedia" }}"
-                                            class="btn btn-outline-success btn-sm w-100" target="_blank">
+                                        <a href="https://wa.me/{{ $boardingHouse->owner->whatsapp_number }}?text=Halo%2C%20saya%20ingin%20memesan%20kamar%20kos%20dengan%20detail%20sebagai%20berikut%3A%0A%0A%2A%2A%2A%20Kamar%20Kos%20Detail%20%2A%2A%2A%0A%0A%2D%20*Kamar%20No*:%20No.%20{{ $room->room_number }}%0A%2D%20*Ukuran*: {{ $room->size }}m%5E2%0A%2D%20*Harga*: {{ formatRupiah($room->price) }}%2Fbulan%0A%2D%20*Status*: {{ __("room_status." . $room->status) }}%0A%0A%2A%2A%2A%20Detail%20Pengguna%20%2A%2A%2A%0A%0A%2D%20*Nama*: {{ auth()->user()->name }}%0A%2D%20*Email*: {{ auth()->user()->email }}%0A%2D%20*Nomor%20Telepon*: {{ auth()->user()->phone_number }}%0A%2D%20*Alamat*: {{ auth()->user()->address ?? "Tidak tersedia" }}"
+                                            class="btn btn-outline-dark btn-sm w-100" target="_blank">
                                             <i class="bi bi-chat-left-dots me-1"></i> Pesan Kamar
                                         </a>
                                     </div>

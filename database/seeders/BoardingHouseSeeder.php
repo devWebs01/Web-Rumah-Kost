@@ -19,12 +19,12 @@ class BoardingHouseSeeder extends Seeder
         try {
             if (User::count() < 5) {
                 User::factory()->count(5)->create();
-                $this->command->info("✔️-5 User berhasil dibuat sebagai pemilik.");
+                $this->command->info(" ✓ 5 User berhasil dibuat sebagai pemilik.");
             } else {
-                $this->command->info("ℹ️ Sudah ada " . User::count() . " User, tidak perlu membuat baru.");
+                $this->command->info(" ! Sudah ada " . User::count() . " User, tidak perlu membuat baru.");
             }
         } catch (Exception $e) {
-            $this->command->error("❌-Gagal membuat User: " . $e->getMessage());
+            $this->command->error("✗ Gagal membuat User: " . $e->getMessage());
         }
 
         // 2. Buat 10 BoardingHouse
@@ -33,7 +33,7 @@ class BoardingHouseSeeder extends Seeder
                 ->count(10)
                 ->create()
                 ->each(function ($boardingHouse) {
-                    $this->command->info("✔️-BoardingHouse dibuat: [ID={$boardingHouse->id}] {$boardingHouse->name}");
+                    $this->command->info(" ✓ BoardingHouse dibuat: [ID={$boardingHouse->id}] {$boardingHouse->name}");
 
                     // 3. Buat 5–10 kamar untuk setiap boarding house
                     try {
@@ -43,9 +43,9 @@ class BoardingHouseSeeder extends Seeder
                             ->create([
                                 'boarding_house_id' => $boardingHouse->id,
                             ]);
-                        $this->command->info("✔️-{$roomCount} Room berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
+                        $this->command->info(" ✓ {$roomCount} Room berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
                     } catch (Exception $e) {
-                        $this->command->error("❌-Gagal membuat Room untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
+                        $this->command->error("✗ Gagal membuat Room untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
                     }
 
                     // 4. Buat 3–6 fasilitas untuk setiap boarding house
@@ -71,9 +71,9 @@ class BoardingHouseSeeder extends Seeder
                                 'name' => $name,
                             ]);
                         }
-                        $this->command->info("✔️-" . count($takeFacilities) . " Facility berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
+                        $this->command->info(" ✓ " . count($takeFacilities) . " Facility berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
                     } catch (Exception $e) {
-                        $this->command->error("❌-Gagal membuat Facility untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
+                        $this->command->error("✗ Gagal membuat Facility untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
                     }
 
                     // 5. Buat 3–7 aturan (regulations) untuk setiap boarding house
@@ -109,9 +109,9 @@ class BoardingHouseSeeder extends Seeder
                                 'rule' => $rule,
                             ]);
                         }
-                        $this->command->info("✔️-" . count($takeRegulations) . " Regulation berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
+                        $this->command->info(" ✓ " . count($takeRegulations) . " Regulation berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
                     } catch (Exception $e) {
-                        $this->command->error("❌-Gagal membuat Regulation untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
+                        $this->command->error("✗ Gagal membuat Regulation untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
                     }
 
                     // 6. Tambahkan 4–6 foto gallery per boarding house
@@ -122,13 +122,13 @@ class BoardingHouseSeeder extends Seeder
                             ->create([
                                 'boarding_house_id' => $boardingHouse->id
                             ]);
-                        $this->command->info("✔️-{$galleryCount} Gallery berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
+                        $this->command->info(" ✓ {$galleryCount} Gallery berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
                     } catch (Exception $e) {
-                        $this->command->error("❌-Gagal membuat Gallery untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
+                        $this->command->error("✗ Gagal membuat Gallery untuk BoardingHouse ID={$boardingHouse->id}: " . $e->getMessage());
                     }
                 });
         } catch (Exception $e) {
-            $this->command->error("❌-Gagal membuat BoardingHouse: " . $e->getMessage());
+            $this->command->error("✗ Gagal membuat BoardingHouse: " . $e->getMessage());
         }
     }
 }
