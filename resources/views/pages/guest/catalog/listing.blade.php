@@ -1,14 +1,57 @@
 <?php
 
-use App\Models\BoardingHouse;
-use function Livewire\Volt\{state};
+use App\Models\{BoardingHouse, Facility};
+use function Livewire\Volt\{state, computed, usesPagination};
 use function Laravel\Folio\{name};
+
+usesPagination(theme: "bootstrap");
 
 name("catalog.listing");
 
 state([
-    "boardingHouses" => fn() => BoardingHouse::where("verification_status", "verified")->get(),
+    "availableFacilities" => fn() => Facility::get(),
+    "sort" => "",
+    "category" => [], // array of kategori tipe id (Putra, Putri, Campur)
+    "facilities" => [], // array of fasilitas id
 ]);
+
+// Untuk dropdown filter dinamis (jika perlu)
+
+$boardingHouses = computed(function () {
+    $query = BoardingHouse::query()
+        ->where("verification_status", "verified") // tampilkan hanya kos yang diverifikasi
+        ->with(["rooms", "facilities"]); // eager load
+
+    // Filter kategori/tipenya
+    if (!empty($this->category)) {
+        // diasumsikan category_id sesuai id dari kategori tipe (putra, putri, campur)
+        $query->whereIn("category", $this->category);
+    }
+
+    // Filter fasilitas
+    if (!empty($this->facilities)) {
+        foreach ($this->facilities as $facilityId) {
+            $query->whereHas("facilities", fn($q) => $q->where("facilities.id", $facilityId));
+        }
+    }
+
+    // Urutan
+    switch ($this->sort) {
+        case "price_asc":
+            $query->withMin("rooms", "price")->orderBy("created_at", "asc");
+            break;
+        case "price_desc":
+            $query->withMin("rooms", "price")->orderBy("created_at", "desc");
+            break;
+        case "newest":
+            $query->orderBy("created_at", "desc");
+            break;
+        default:
+            $query->latest();
+    }
+
+    return $query->paginate(5);
+});
 ?>
 
 <x-guest-layout>
@@ -20,71 +63,63 @@ state([
 
                     <aside class="col-lg-4">
                         <div class="p-4 shadow-sm rounded-3 bg-light pt-5">
-                            <h4 class="fw-bold mb-4">Filter Pencarian</h4>
+                            <h4 class="fw-bold mb-4">Filter Pencarian </h4>
 
+                            {{-- Sort --}}
                             <div class="mb-4">
                                 <label for="sort" class="form-label fw-semibold">Urutkan Berdasarkan</label>
-                                <select class="form-select" id="sort">
-                                    <option selected>Relevansi</option>
+                                <select class="form-select" id="sort" wire:model.live="sort">
+                                    <option value="">Pilih Satu</option>
                                     <option value="price_asc">Harga Termurah</option>
                                     <option value="price_desc">Harga Termahal</option>
                                     <option value="newest">Terbaru</option>
                                 </select>
                             </div>
-
-                            <div class="mb-4">
-                                <label for="priceRange" class="form-label fw-semibold">Rentang Harga</label>
-                                <input type="range" class="form-range" min="0" max="5000000" step="100000"
-                                    id="priceRange">
-                                <div class="d-flex justify-content-between text-muted small mt-1">
-                                    <span>Rp 0</span>
-                                    <span>Rp 5.000.000+</span>
-                                </div>
-                            </div>
-
+                            {{-- Tipe Kost --}}
                             <div class="mb-4">
                                 <h6 class="fw-semibold">Tipe Kost</h6>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="typePutra">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="category"
+                                        value="male" id="typePutra">
                                     <label class="form-check-label" for="typePutra">Putra</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="typePutri">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="category"
+                                        value="female" id="typePutri">
                                     <label class="form-check-label" for="typePutri">Putri</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="typeCampur" checked>
+                                    <input class="form-check-input" type="checkbox" wire:model.live="category"
+                                        value="mixed" id="typeCampur">
                                     <label class="form-check-label" for="typeCampur">Campur</label>
                                 </div>
                             </div>
 
+                            {{-- Fasilitas --}}
                             <div class="mb-4">
                                 <h6 class="fw-semibold">Fasilitas</h6>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="fasilitasAC" checked>
+                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
+                                        value="1" id="fasilitasAC">
                                     <label class="form-check-label" for="fasilitasAC">AC</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="fasilitasKM">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
+                                        value="2" id="fasilitasKM">
                                     <label class="form-check-label" for="fasilitasKM">Kamar Mandi Dalam</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="fasilitasWifi"
-                                        checked>
+                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
+                                        value="3" id="fasilitasWifi">
                                     <label class="form-check-label" for="fasilitasWifi">Wi-Fi</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="fasilitasParkir">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
+                                        value="4" id="fasilitasParkir">
                                     <label class="form-check-label" for="fasilitasParkir">Parkir Mobil</label>
                                 </div>
                             </div>
 
-                            <div class="d-grid">
-                                <button class="btn btn-primary btn-lg" type="button">
-                                    <i class="fas fa-filter me-2">
-                                    </i>Terapkan Filter
-                                </button>
-                            </div>
                         </div>
                     </aside>
 
@@ -94,7 +129,7 @@ state([
                             <p class="text-muted mb-0">Menampilkan 1-5 dari 28 kost</p>
                         </div>
 
-                        @foreach ($boardingHouses as $item)
+                        @foreach ($this->boardingHouses as $item)
                             <div class="card kost-card mb-4 shadow-sm">
                                 <div class="row g-0">
                                     <div class="col-md-4">
@@ -145,26 +180,7 @@ state([
                             </div>
                         @endforeach
 
-                        <nav aria-label="Page navigation" class="mt-5">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1"
-                                        aria-disabled="true">Sebelumnya</a>
-                                </li>
-                                <li class="page-item active" aria-current="page">
-                                    <a class="page-link" href="#">1</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">2</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">3</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Selanjutnya</a>
-                                </li>
-                            </ul>
-                        </nav>
+                        {{ $this->boardingHouses->links() }}
 
                     </section>
                 </div>

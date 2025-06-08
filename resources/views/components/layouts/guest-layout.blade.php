@@ -842,6 +842,10 @@
         <style lang="en" type="text/css" id="dark-mode-native-style"></style>
         <style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
 
+        @livewireStyles
+
+        @stack("styles")
+
         @vite([])
     </head>
 
@@ -849,7 +853,9 @@
         <!-- Navigation -->
         <x-guest-nav></x-guest-nav>
 
-        {{ $slot }}
+        <main class="pt-5">
+            {{ $slot }}
+        </main>
 
         <!-- Footer -->
         <footer>
@@ -1252,6 +1258,12 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
             integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
         </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        @livewireScripts
+
+        @stack("scripts")
     </body>
 
 </html>
