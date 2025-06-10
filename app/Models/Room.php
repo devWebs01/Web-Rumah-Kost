@@ -22,4 +22,9 @@ class Room extends Model
     {
         return $this->belongsTo(BoardingHouse::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

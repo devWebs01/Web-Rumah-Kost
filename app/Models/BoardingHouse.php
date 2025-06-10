@@ -45,4 +45,5 @@ class BoardingHouse extends Model
     {
         return $this->hasMany(Gallery::class);
     }
+
 }

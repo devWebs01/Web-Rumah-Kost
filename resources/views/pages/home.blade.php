@@ -47,9 +47,9 @@ state([
                     <div class="row">
                         <div class="col-md-8">
                             <div class="card border">
+                                <h4 class="text-center fw-semibold card-header">Total Kos Terdaftar</h4>
                                 <div class="card-body">
                                     <div class="p-0">
-                                        <h4 class="text-center fw-semibold">Total Kos Terdaftar: {{ $totalKos }}</h4>
 
                                         <div class="mt-4">
                                             <canvas id="registrationChart"></canvas>
@@ -60,9 +60,9 @@ state([
                         </div>
                         <div class="col-md-4">
                             <div class="card border">
+                                <h4 class="text-center fw-semibold card-header">Distribusi Gender Kos</h4>
                                 <div class="card-body">
                                     <div class="mt-8">
-                                        <h4 class="text-center fw-semibold">Distribusi Gender Kos</h4>
                                         <canvas id="genderDonutChart" class="mt-4"></canvas>
                                     </div>
                                 </div>
@@ -71,7 +71,7 @@ state([
                     </div>
 
                     <div class="card border">
-                        <h4 class="text-center fw-semibold">Daftar Kos Butuh Verifikasi!</h4>
+                        <h4 class="text-center fw-semibold card-header">Daftar Kos Butuh Verifikasi!</h4>
 
                         <div class="card-body">
                             <div class="table-responsive">
