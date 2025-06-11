@@ -18,7 +18,7 @@ class Room extends Model
         'status',
     ];
 
-    public function boarding_house(): BelongsTo
+    public function boardingHouse(): BelongsTo
     {
         return $this->belongsTo(BoardingHouse::class);
     }

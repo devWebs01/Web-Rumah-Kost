@@ -1248,6 +1248,9 @@
                 </div>
             </div>
         </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
         <iframe height="1" width="1"
             style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
 

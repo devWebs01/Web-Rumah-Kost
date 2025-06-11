@@ -15,6 +15,16 @@ state([
     //
     "duration" => "",
     "check_in" => "",
+    "rooms" => fn() => $this->boardingHouse->rooms->map(function ($room) {
+        $isAvailable = $room->status === "available";
+
+        return (object) array_merge($room->toArray(), [
+            "isAvailable" => $isAvailable,
+            "statusClass" => $isAvailable ? "success" : "danger",
+            "statusIcon" => $isAvailable ? "check" : "x",
+            "buttonClass" => $isAvailable ? "primary" : "secondary disabled",
+        ]);
+    }),
 ]);
 
 $selectRoom = function ($roomId) {
@@ -97,7 +107,7 @@ $submitTransaction = function () {
     @volt
         <div class="container my-5">
             <div class="row">
-                <div class="col-lg-7">
+                <div class="col-lg-6">
                     <div class="kost-gallery">
                         <img src="{{ Storage::url($boardingHouse->thumbnail) }}" class="img-fluid w-100 mb-3"
                             alt="Foto Utama Kos">
@@ -113,8 +123,8 @@ $submitTransaction = function () {
                     </div>
                 </div>
 
-                <div class="col-lg-5">
-                    <div class="card shadow-sm border-0">
+                <div class="col-lg-6" id="formTransaction">
+                    <div class="card shadow-0 border-0">
                         <div class="card-body">
                             <p>
                                 <span class="badge bg-primary">{{ __("category." . $boardingHouse->category) }}</span>
@@ -129,13 +139,22 @@ $submitTransaction = function () {
                                 <i class="bi bi-map-fill me-2">
                                 </i>Lihat di Google Maps</a>
 
-                            <div class="alert alert-info" role="alert">
+                            <div class="alert alert-secondary" role="alert">
                                 <p>Silakan pilih tipe kamar yang tersedia untuk melanjutkan pemesanan.</p>
 
-                                <form wire:submit="submitTransaction">
+                                <form wire:submit="submitTransaction" class="row">
                                     @csrf
-                                    <div class="mb-3">
-                                        <label for="check_in" class="form-label">Tanggal Mulai Sewa</label>
+
+                                    <div class="col-12 mb-3">
+                                        <input type="text" id="roomId" class="form-control" aria-describedby="helpId"
+                                            placeholder="kamar yang dipilih"
+                                            value="{{ $selectedRoom !== null ? "Kamar " . $selectedRoom->room_number : "" }}"
+                                            readonly />
+
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="check_in" class="form-label">Tanggal Mulai</label>
                                         <input type="date" wire:model="check_in" class="form-control form-control-sm"
                                             name="check_in" id="check_in" aria-describedby="check_in"
                                             min="{{ today()->format("Y-m-d") }}" placeholder="check_in" />
@@ -145,11 +164,11 @@ $submitTransaction = function () {
                                         @enderror
                                     </div>
 
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="duration" class="form-label">Durasi Sewa</label>
                                         <select wire:model.live="duration" class="form-select form-select-sm"
                                             name="duration" id="duration">
-                                            <option selected>Select one</option>
+                                            <option selected>Pilih Durasi</option>
                                             <option value="1">Per 1 Bulan</option>
                                             <option value="3">Per 3 Bulan</option>
                                             <option value="6">Per 6 Bulan</option>
@@ -208,147 +227,62 @@ $submitTransaction = function () {
 
             <section id="daftar-kamar" class="my-5">
                 <h2 class="section-title">Pilihan Kamar</h2>
-                @foreach ($boardingHouse->rooms as $room)
-                    <div class="card card-room mb-3 shadow-sm">
+
+                @foreach ($rooms as $room)
+                    {{-- @php
+                        $isAvailable = $room->status === "available";
+                        $statusClass = $isAvailable ? "success" : "danger";
+                        $statusIcon = $isAvailable ? "check" : "x";
+                        $buttonClass = $isAvailable ? "primary" : "secondary disabled";
+                    @endphp --}}
+
+                    <div class="card card-room mb-3 shadow-sm rounded">
                         <div class="row g-0">
-                            <div class="col-md-3">
-                                <img src="https://dummyimage.com/600x400/000/bfbfbf&text=no+image"
-                                    class="img-fluid rounded-start h-100 w-100 object-fit-cover"
-                                    alt="{{ $room->room_number }}">
+                            <div class="col-md-2">
+                                <img src="https://dummyimage.com/600x400/000/bfbfbf&text={{ $room->size }}"
+                                    class="img-fluid object-fit-cover w-100 h-100" loading="lazy"
+                                    alt="Kamar {{ $room->room_number }}">
                             </div>
-                            <div class="col-md-9">
+
+                            <div class="col-md-10">
                                 <div class="card-body d-flex flex-column h-100">
+
+                                    {{-- Judul & Status --}}
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <h5 class="card-title fw-bold">
-                                            Kamar {{ $room->room_number }}
-                                        </h5>
-                                        <span class="badge bg-{{ $room->status === "available" ? "success" : "danger" }}">
-                                            <i
-                                                class="bi bi-{{ $room->status === "available" ? "check" : "x" }}-circle me-1">
-                                            </i>
+                                        <div>
+                                            <h5 class="card-title fw-bold mb-2">Kamar {{ $room->room_number }}</h5>
+                                            <small class="fw-semibold text-muted">Ukuran: {{ $room->size }}
+                                                m<sup>2</sup>
+                                            </small>
+                                        </div>
+
+                                        <span class="badge bg-{{ $room->statusClass }}">
+                                            <i class="bi bi-{{ $room->statusIcon }}-circle me-1"></i>
                                             {{ __("room_status." . $room->status) }}
                                         </span>
                                     </div>
 
-                                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                                    {{-- Harga & Tombol --}}
+                                    <div class="mt-auto d-flex justify-content-between align-items-center pt-3">
                                         <p class="card-text fs-5 fw-bold text-primary mb-0">
                                             {{ formatRupiah($room->price) }}
                                             <small class="fw-normal">/bulan</small>
                                         </p>
-                                        <button wire:click='selectRoom({{ $room->id }})'
-                                            class="btn btn-{{ $room->status === "available" ? "primary" : "secondary disabled" }}">
+
+                                        <a href="#formTransaction" wire:click='selectRoom({{ $room->id }})'
+                                            class="btn btn-{{ $room->buttonClass }}">
                                             Sewa Sekarang
-                                        </button>
+                                        </a>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
-
             </section>
 
-            <section id="review" class="my-5">
-                <h2 class="section-title">Review Pengguna</h2>
-                <div class="card card-body border-0 shadow-sm">
-                    <div class="d-flex align-items-center mb-3">
-                        <h3 class="fw-bold mb-0 me-3">4.8</h3>
-                        <div class="review-stars fs-4">
-                            <i class="bi bi-star-fill">
-
-                            </i>
-                            <i class="bi bi-star-fill">
-
-                            </i>
-                            <i class="bi bi-star-fill">
-
-                            </i>
-                            <i class="bi bi-star-fill">
-
-                            </i>
-                            <i class="bi bi-star-half">
-
-                            </i>
-                        </div>
-                        <span class="ms-3 text-muted">(dari 25 review)</span>
-                    </div>
-                    <hr>
-
-                    <div class="review-list">
-                        <div class="d-flex mb-3">
-                            <img src="https://i.pravatar.cc/50?u=a" alt="User" class="rounded-circle me-3"
-                                style="width: 50px; height: 50px;">
-                            <div>
-                                <h6 class="fw-bold mb-0">Budi Santoso</h6>
-                                <div class="review-stars small">
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                </div>
-                                <p class="mt-1">Tempatnya bersih, nyaman, dan fasilitasnya lengkap. Bapak kos ramah.
-                                    Recommended!</p>
-                            </div>
-                        </div>
-                        <div class="d-flex mb-3">
-                            <img src="https://i.pravatar.cc/50?u=b" alt="User" class="rounded-circle me-3"
-                                style="width: 50px; height: 50px;">
-                            <div>
-                                <h6 class="fw-bold mb-0">Citra Lestari</h6>
-                                <div class="review-stars small">
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star-fill">
-                                    </i>
-                                    <i class="bi bi-star">
-                                    </i>
-                                </div>
-                                <p class="mt-1">Cukup baik, hanya saja sinyal WiFi kadang kurang stabil di kamar saya.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="add-review mt-4">
-                        <h5 class="fw-bold">Tulis Review Anda</h5>
-                        <form>
-                            <div class="mb-3">
-                                <label for="namaReviewer" class="form-label">Nama Anda</label>
-                                <input type="text" class="form-control" id="namaReviewer"
-                                    placeholder="Masukkan nama Anda">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Rating</label>
-                                <select class="form-select" aria-label="Default select example">
-                                    <option selected>Pilih rating bintang</option>
-                                    <option value="5">★★★★★ (Luar Biasa)</option>
-                                    <option value="4">★★★★☆ (Baik)</option>
-                                    <option value="3">★★★☆☆ (Cukup)</option>
-                                    <option value="2">★★☆☆☆ (Kurang)</option>
-                                    <option value="1">★☆☆☆☆ (Buruk)</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="komentar" class="form-label">Komentar Anda</label>
-                                <textarea class="form-control" id="komentar" rows="3"
-                                    placeholder="Bagikan pengalaman Anda menginap di sini...">
-                                </textarea>
-                            </div>
-                            <button type="submit" class="btn btn-success">Kirim Review</button>
-                        </form>
-                    </div>
-                </div>
-            </section>
+            @include("pages.guest.catalog.review")
 
         </div>
     @endvolt

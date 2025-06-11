@@ -15,7 +15,7 @@ class Facility extends Model
         'boarding_house_id',
     ];
 
-    public function boarding_house(): BelongsTo
+    public function boardingHouse(): BelongsTo
     {
         return $this->belongsTo(BoardingHouse::class);
     }
