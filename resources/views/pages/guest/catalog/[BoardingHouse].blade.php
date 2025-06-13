@@ -58,7 +58,7 @@ $submitTransaction = function () {
     }
 
     // Simpan transaksi
-    Transaction::create([
+    $transaction = Transaction::create([
         "user_id" => Auth::id(),
         "room_id" => $this->selectedRoom->id,
         "code" => "INV-" . Carbon::today()->format("dmymsi"),
@@ -66,6 +66,10 @@ $submitTransaction = function () {
         "check_out" => Carbon::parse($this->check_in)->addMonths($this->duration),
         "total" => $this->total,
     ]);
+
+    if ($transaction) {
+        $this->selectedRoom->update(["status" => "booked"]);
+    }
 
     // Tampilkan notifikasi
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
@@ -165,7 +169,7 @@ $submitTransaction = function () {
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="duration" class="form-label">Durasi Sewa</label>
+                                        <label for="duration" class="form-label">Periode Sewa</label>
                                         <select wire:model.live="duration" class="form-select form-select-sm"
                                             name="duration" id="duration">
                                             <option selected>Pilih Durasi</option>

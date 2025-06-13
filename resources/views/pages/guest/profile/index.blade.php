@@ -83,12 +83,26 @@ $edit = function () {
             <x-slot name="title">{{ $user->name }}</x-slot>
 
             <div class="container mt-5">
-                <div class="card border-0">
-                    <div class="alert alert-primary border-0" role="alert">
-                        <strong>Data Profile</strong>
-                        <p>Pada halaman edit pengguna, kamu dapat mengubah informasi pengguna.
-                        </p>
+                <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+                    <div class="card-body px-4 py-3">
+                        <div class="row align-items-center">
+                            <div class="col-9">
+                                <h4 class="fw-semibold mb-8">Data Profil Akun</h4>
+                                <p class="text-muted mb-4 fs-6">
+                                    Pada halaman edit pengguna, kamu dapat mengubah informasi pengguna.
+                                </p>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-center mb-n5">
+                                    <img src="https://ouch-prod-var-cdn.icons8.com/iy/illustrations/thumbs/HX8M3yKf5cJ8K1f1.webp"
+                                        alt="modernize-img" class="img-fluid w-50 mb-n4">
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="card border-0">
+
                     <div class="card-body border rounded">
                         <form class="row" wire:submit='edit' method="POST" enctype="multipart/form-data">
 

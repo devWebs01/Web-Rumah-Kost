@@ -29,44 +29,68 @@ state([
 
     @volt
         <div class="container my-5">
-            <div class="card border-0">
+            <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+                <div class="card-body px-4 py-3">
+                    <div class="row align-items-center">
+                        <div class="col-9">
+                            <h4 class="fw-semibold mb-8">Daftar Transaksi Anda</h4>
+                            <p class="text-muted mb-4 fs-6">
+                                Lihat riwayat transaksi kos Anda dengan mudah dan cepat. Kelola pembayaran dan status sewa
+                                Anda di sini.
+                            </p>
+                        </div>
+                        <div class="col-3">
+                            <div class="text-center mb-n5">
+                                <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/breadcrumb/ChatBc.png"
+                                    alt="modernize-img" class="img-fluid mb-n4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover table-lg text-nowrap table-bordered">
-                            <thead>
+                        <table class="table table-hover table-lg text-nowrap table-bordered rounded align-middle">
+                            <thead class="table-primary">
                                 <tr>
-                                    <th>No.</th>
-                                    <th>Kos</th>
-                                    <th>Status</th>
-                                    <th>Tanggal Mulai Sewa</th>
-                                    <th>Total</th>
-                                    <th>Opsi</th>
+                                    <th scope="col" style="width: 5%;">No.</th>
+                                    <th scope="col">Kos</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Tanggal Mulai Sewa</th>
+                                    <th scope="col" class="text-end">Total</th>
+                                    <th scope="col" style="width: 10%;">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($transactions as $no => $transaction)
+                                @forelse ($transactions as $no => $transaction)
                                     <tr>
-                                        <td>{{ ++$no }}.. </td>
+                                        <td>{{ $no + 1 }}..</td>
                                         <td>{{ $transaction->room->boardingHouse->name }}</td>
                                         <td>
                                             <span class="badge {{ $transaction->statusClass }}">
-                                                {{ __("transaction_status." . $transaction->status) }}
-                                            </span>
+                                                {{ __("transaction_status." . $transaction->status) }} </span>
                                         </td>
-                                        <td>{{ Carbon::parse($transaction->check_in)->diffInMonths($transaction->check_out) }}
-                                            Bulan
-                                        </td>
-                                        <td>{{ formatRUpiah($transaction->total) }}</td>
+                                        <td>{{ Carbon::parse($transaction->check_in)->format("d M Y") }}</td>
+                                        <td>{{ formatRupiah($transaction->total) }}</td>
                                         <td>
                                             <div class="d-grid gap-2">
-                                                <button type="button" class="btn btn-primary btn-sm">
-                                                    Button
-                                                </button>
+                                                <a href="{{ route("transactions.show", ["transaction" => $transaction->id]) }}"
+                                                    class="btn btn-primary btn-sm" title="Lihat Detail Transaksi">
+                                                    Detail
+                                                </a>
                                             </div>
                                         </td>
-                                    </tr>
-                                @endforeach
 
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted fst-italic">
+                                            Anda belum memiliki transaksi.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -74,5 +98,14 @@ state([
                 </div>
             </div>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                })
+            });
+        </script>
     @endvolt
 </x-guest-layout>

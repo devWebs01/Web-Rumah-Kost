@@ -32,8 +32,13 @@ $logout = function () {
                             <a class="nav-link " href="#">Kontak</a>
                         </li>
 
+                        <li class="nav-item mx-sm-0 mx-lg-2 {{ Auth()->check() ?: "d-none" }}">
+                            <a class="nav-link " href="{{ route("transactions.index") }}">Transaksi</a>
+                        </li>
+
                         <li class="nav-item mx-sm-0 mx-lg-2">
                             @auth
+
                                 @if (Auth::user()->role === "admin")
                                     <a class="btn btn-outline-primary" href="{{ route("home") }}">Dashboard</a>
                                 @elseif (Auth::user()->role === "owner")

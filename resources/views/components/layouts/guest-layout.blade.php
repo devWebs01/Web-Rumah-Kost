@@ -837,10 +837,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"
             rel="stylesheet">
         <link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
-        <link type="text/css" rel="stylesheet" id="dark-mode-general-link">
-        <style lang="en" type="text/css" id="dark-mode-custom-style"></style>
-        <style lang="en" type="text/css" id="dark-mode-native-style"></style>
-        <style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
+        <link rel="stylesheet" href="/fe-assets/style.css">
+
 
         @livewireStyles
 
@@ -861,7 +859,7 @@
         <footer>
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-4 mb-5 mb-lg-0">
+                    <div class="col-lg mb-5 mb-lg-0">
                         <h3 class="footer-title">E-Kost</h3>
                         <p class="text-white-50 mb-4">Platform terintegrasi untuk pencarian, booking, dan manajemen
                             kost
@@ -893,26 +891,7 @@
                             <li><a href="#">Bantuan</a></li>
                         </ul>
                     </div>
-                    <div class="col-lg-4">
-                        <h5 class="footer-title">Kontak</h5>
-                        <div class="footer-contact">
-                            <i class="bi bi-geo-alt"></i>
-                            <span>Jl. Sudirman No. 123, Jakarta Pusat</span>
-                        </div>
-                        <div class="footer-contact">
-                            <i class="bi bi-telephone"></i>
-                            <span>+62 21 1234 5678</span>
-                        </div>
-                        <div class="footer-contact">
-                            <i class="bi bi-envelope"></i>
-                            <span>info@e-kost.id</span>
-                        </div>
-                        <div class="footer-contact">
-                            <i class="bi bi-clock"></i>
-                            <span>Senin - Jumat: 09:00 - 17:00</span>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="copyright">
                     <p>© 2023 E-Kost. All Rights Reserved.</p>
                 </div>

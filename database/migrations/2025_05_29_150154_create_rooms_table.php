@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,8 +17,10 @@ return new class extends Migration
             $table->string('price');
             $table->string('size');
             $table->enum('status', [
-                'available',
-                'unavailable',
+                'available',    // Tersedia untuk disewa
+                'booked',       // Sedang dipesan (tapi belum ditempati)
+                'occupied',     // Sudah ditempati
+                'unavailable',  // Tidak bisa disewa (perawatan, rusak, dll)
             ])->default('available');
             $table->timestamps();
         });
