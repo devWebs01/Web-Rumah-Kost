@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      * 'name',
@@ -26,6 +25,7 @@ return new class extends Migration
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->enum('category', ['male', 'female', 'mixed']);
             $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending');
+            $table->enum('minimum_rental_period', ['1', '3', '6', '12'])->default('1');
             $table->timestamps();
         });
     }

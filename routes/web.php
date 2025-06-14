@@ -1,10 +1,8 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DeviceController;
-use App\Http\Controllers\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +23,14 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('/wa', function () {
+    $fonnte = new \App\Services\FonnteService;
+
+    $userPhone = '08978301766'; // pastikan nomor aktif & terdaftar
+
+    $message = 'WOIIIIIIIIIIIIIIIII Halo! Ini adalah pesan tes dari sistem Laravel.';
+
+    $result = $fonnte->send($userPhone, $message);
+
+    dd($result); // Lihat hasil response dari Fonnte
+});

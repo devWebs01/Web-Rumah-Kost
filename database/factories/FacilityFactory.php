@@ -34,9 +34,9 @@ class FacilityFactory extends Factory
         return [
             // boarding_house_id akan di‐assign di Seeder
             'boarding_house_id' => BoardingHouse::inRandomOrder()->first()->id ?? BoardingHouse::factory(),
-            'name'              => $this->faker->randomElement($sampleFacilities),
-            'created_at'        => now(),
-            'updated_at'        => now(),
+            'name' => $this->faker->randomElement($sampleFacilities),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

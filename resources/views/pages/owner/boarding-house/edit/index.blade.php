@@ -17,13 +17,14 @@ state([
     "user" => Auth::user(),
     "boardingHouse" => fn() => $this->user->boardingHouse ?? null,
 
-    // kost
+    // kos
     "name" => fn() => $this->boardingHouse->name,
     "location_map" => fn() => $this->boardingHouse->location_map,
     "address" => fn() => $this->boardingHouse->address,
     "owner_id" => fn() => $this->boardingHouse->owner_id,
     "thumbnail",
     "category" => fn() => $this->boardingHouse->category,
+    "minimum_rental_period" => fn() => $this->boardingHouse->minimum_rental_period,
 
     // Kamar
     "boarding_house_id" => fn() => $this->boardingHouse->id,
@@ -62,7 +63,7 @@ $save = function () {
         "address" => "required|string",
         "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
         "category" => "required|in:male,female,mixed",
-        // "verification_status" => "nullable",
+        "minimum_rental_period" => "required|in:1,3,6,12",
     ]);
 
     $validatedBoardingHouse["owner_id"] = Auth::id();
@@ -141,6 +142,13 @@ $save = function () {
 ?>
 
 <x-panel-layout>
+    <x-slot name="title">Data Kos</x-slot>
+    <x-slot name="header">
+        <li class="breadcrumb-item">
+            <a href="{{ route("boardingHouse.index") }}">Data Kos</a>
+        </li>
+    </x-slot>
+
     @volt
         <div>
             @include("components.partials.tom-select")
@@ -150,10 +158,11 @@ $save = function () {
                 <div class="card border rounded">
                     <div class="card-body bg-white">
                         <div class="row">
-                            {{-- Nama Kost --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nama Kost</label>
-                                <input type="text" class="form-control" wire:model="name" placeholder="Masukkan nama kost">
+                            {{-- Nama Kos --}}
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Nama Kos</label>
+                                <input type="text" class="form-control" wire:model="name"
+                                    placeholder="Masukkan nama kos">
                                 @error("name")
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -161,7 +170,7 @@ $save = function () {
 
                             {{-- Thumbnail --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Foto Sampul Kost</label>
+                                <label class="form-label">Foto Sampul Kos</label>
                                 <input type="file" class="form-control" wire:model="thumbnail"
                                     placeholder="Link gambar thumbnail" accept="image/*">
                                 @error("thumbnail")
@@ -171,7 +180,7 @@ $save = function () {
 
                             {{-- Kategori --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Kategori Kost</label>
+                                <label class="form-label">Kategori Kos</label>
                                 <select class="form-select" wire:model="category">
                                     <option selected disabled>Pilih Satu</option>
                                     <option value="male">Laki-laki</option>
@@ -193,6 +202,21 @@ $save = function () {
                                 @enderror
                             </div>
 
+                            <div class="col-md-6 mb-3">
+                                <label for="minimum_rental_period" class="form-label">Minimum Lama Sewa (bulan)</label>
+                                <select id="minimum_rental_period" wire:model="minimum_rental_period" class="form-select">
+                                    <option value="">-- Pilih Minimum Lama Sewa --</option>
+                                    <option value="1" @selected($minimum_rental_period === "1")>1 bulan</option>
+                                    <option value="3" @selected($minimum_rental_period === "3")>3 bulan</option>
+                                    <option value="6" @selected($minimum_rental_period === "6")>6 bulan</option>
+                                    <option value="12" @selected($minimum_rental_period === "12")>12 bulan</option>
+                                </select>
+
+                                @error("minimum_rental_period")
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
                             {{-- Alamat --}}
                             <div class="col-12 mb-3">
                                 <label class="form-label">Alamat Lengkap</label>
@@ -203,34 +227,66 @@ $save = function () {
                             </div>
 
                             {{-- Fasilitas --}}
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="facilities" class="form-label">Fasilitas</label>
-                                    <div wire:ignore>
-                                        <input type="text" wire:model="facilities" id="input-tags"
-                                            aria-describedby="facilitiesId" autocomplete="facilities"
-                                            value="{{ implode(",", is_array($facilities) ? $facilities : explode(",", $facilities)) }}" />
-                                    </div>
-
-                                    @error("facilities")
-                                        <small id="facilitiesId" class="form-text text-danger">{{ $message }}</small>
-                                    @enderror
-                                    <br>
-                                    @error("facilities.*")
-                                        <small id="facilitiesId" class="form-text text-danger">{{ $message }}</small>
-                                    @enderror
+                            <div class="col-12 mb-3">
+                                <label for="facilities" class="form-label">Fasilitas</label>
+                                <div wire:ignore>
+                                    <select wire:model='facilities' multiple name="facilities" id="input-tags">
+                                        <option value="Balkon" @selected(in_array("Balkon", $facilities))>Balkon</option>
+                                        <option value="CCTV" @selected(in_array("CCTV", $facilities))>CCTV</option>
+                                        <option value="Dapur" @selected(in_array("Dapur", $facilities))>Dapur</option>
+                                        <option value="Dispenser" @selected(in_array("Dispenser", $facilities))>Dispenser</option>
+                                        <option value="Duplikat Gerbang Kos" @selected(in_array("Duplikat Gerbang Kos", $facilities))>Duplikat Gerbang
+                                            Kos</option>
+                                        <option value="Gazebo" @selected(in_array("Gazebo", $facilities))>Gazebo</option>
+                                        <option value="Jemuran" @selected(in_array("Jemuran", $facilities))>Jemuran</option>
+                                        <option value="Joglo" @selected(in_array("Joglo", $facilities))>Joglo</option>
+                                        <option value="Jual Makanan" @selected(in_array("Jual Makanan", $facilities))>Jual Makanan</option>
+                                        <option value="K Mandi Luar" @selected(in_array("K Mandi Luar", $facilities))>K Mandi Luar</option>
+                                        <option value="Kamar Mandi Luar - WC Duduk" @selected(in_array("Kamar Mandi Luar - WC Duduk", $facilities))>Kamar
+                                            Mandi Luar - WC Duduk</option>
+                                        <option value="Kamar Mandi Luar - WC Jongkok" @selected(in_array("Kamar Mandi Luar - WC Jongkok", $facilities))>Kamar
+                                            Mandi Luar - WC Jongkok</option>
+                                        <option value="Kartu Akses" @selected(in_array("Kartu Akses", $facilities))>Kartu Akses</option>
+                                        <option value="Kompor" @selected(in_array("Kompor", $facilities))>Kompor</option>
+                                        <option value="Kulkas" @selected(in_array("Kulkas", $facilities))>Kulkas</option>
+                                        <option value="Laundry" @selected(in_array("Laundry", $facilities))>Laundry</option>
+                                        <option value="Loker" @selected(in_array("Loker", $facilities))>Loker</option>
+                                        <option value="Mesin Cuci" @selected(in_array("Mesin Cuci", $facilities))>Mesin Cuci</option>
+                                        <option value="Mushola" @selected(in_array("Mushola", $facilities))>Mushola</option>
+                                        <option value="Pengurus Kos" @selected(in_array("Pengurus Kos", $facilities))>Pengurus Kos</option>
+                                        <option value="Penjaga Kos" @selected(in_array("Penjaga Kos", $facilities))>Penjaga Kos</option>
+                                        <option value="R. Cuci" @selected(in_array("R. Cuci", $facilities))>R. Cuci</option>
+                                        <option value="R. Jemur" @selected(in_array("R. Jemur", $facilities))>R. Jemur</option>
+                                        <option value="R. Keluarga" @selected(in_array("R. Keluarga", $facilities))>R. Keluarga</option>
+                                        <option value="R. Makan" @selected(in_array("R. Makan", $facilities))>R. Makan</option>
+                                        <option value="R. Santai" @selected(in_array("R. Santai", $facilities))>R. Santai</option>
+                                        <option value="R. Tamu" @selected(in_array("R. Tamu", $facilities))>R. Tamu</option>
+                                        <option value="Rice Cooker" @selected(in_array("Rice Cooker", $facilities))>Rice Cooker</option>
+                                        <option value="Rooftop" @selected(in_array("Rooftop", $facilities))>Rooftop</option>
+                                        <option value="TV" @selected(in_array("TV", $facilities))>TV</option>
+                                        <option value="Taman" @selected(in_array("Taman", $facilities))>Taman</option>
+                                        <option value="WIFI" @selected(in_array("WIFI", $facilities))>WIFI</option>
+                                    </select>
                                 </div>
+                                @error("facilities")
+                                    <small id="facilitiesId" class="form-text text-danger">{{ $message }}</small>
+                                @enderror
+                                <br>
+                                @error("facilities.*")
+                                    <small id="facilitiesId" class="form-text text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             {{-- Aturan --}}
                             <div class="col-12 mb-3">
-                                <label for="regulation" class="form-label">Aturan Kost</label>
+                                <label for="regulation" class="form-label">Aturan Kos</label>
                                 <div wire:ignore>
                                     <select wire:model='regulations' multiple name="regulation" id="input-tags">
                                         <option value="5-orang-per-kamar" @selected(in_array("5-orang-per-kamar", $regulations))>5 orang/ kamar
                                         </option>
                                         <option value="ada-jam-malam" @selected(in_array("ada-jam-malam", $regulations))>Ada jam malam</option>
-                                        <option value="ada-jam-malam-untuk-tamu" @selected(in_array("ada-jam-malam-untuk-tamu", $regulations))>Ada jam malam
+                                        <option value="ada-jam-malam-untuk-tamu" @selected(in_array("ada-jam-malam-untuk-tamu", $regulations))>Ada jam
+                                            malam
                                             untuk tamu</option>
                                         <option value="akses-24-jam" @selected(in_array("akses-24-jam", $regulations))>Akses 24 Jam</option>
                                         <option value="bawa-hasil-tes-antigen" @selected(in_array("bawa-hasil-tes-antigen", $regulations))>Bawa hasil tes
@@ -244,7 +300,8 @@ $save = function () {
                                             14:00-21:00 (sewa harian)</option>
                                         <option value="check-out-maks-12" @selected(in_array("check-out-maks-12", $regulations))>Check-out maks.
                                             pukul 12:00 (sewa harian)</option>
-                                        <option value="denda-kerusakan-barang" @selected(in_array("denda-kerusakan-barang", $regulations))>Denda kerusakan
+                                        <option value="denda-kerusakan-barang" @selected(in_array("denda-kerusakan-barang", $regulations))>Denda
+                                            kerusakan
                                             barang kos</option>
                                         <option value="dilarang-bawa-hewan" @selected(in_array("dilarang-bawa-hewan", $regulations))>Dilarang bawa
                                             hewan</option>
@@ -273,9 +330,11 @@ $save = function () {
                                             kamar</option>
                                         <option value="maks-2-orang-sewa-harian" @selected(in_array("maks-2-orang-sewa-harian", $regulations))>Maksimal 2
                                             orang (sewa harian)</option>
-                                        <option value="swab-negatif-check-in" @selected(in_array("swab-negatif-check-in", $regulations))>Menunjukan bukti
+                                        <option value="swab-negatif-check-in" @selected(in_array("swab-negatif-check-in", $regulations))>Menunjukan
+                                            bukti
                                             (-) Swab saat check-in</option>
-                                        <option value="pasutri-bawa-surat-nikah" @selected(in_array("pasutri-bawa-surat-nikah", $regulations))>Pasutri wajib
+                                        <option value="pasutri-bawa-surat-nikah" @selected(in_array("pasutri-bawa-surat-nikah", $regulations))>Pasutri
+                                            wajib
                                             membawa surat nikah (sewa harian)</option>
                                         <option value="biaya-alat-elektronik" @selected(in_array("biaya-alat-elektronik", $regulations))>Tambah biaya
                                             untuk alat elektronik</option>
@@ -293,7 +352,8 @@ $save = function () {
                                         </option>
                                         <option value="tidak-bisa-dp" @selected(in_array("tidak-bisa-dp", $regulations))>Tidak bisa DP (sewa
                                             harian)</option>
-                                        <option value="tidak-boleh-bawa-anak" @selected(in_array("tidak-boleh-bawa-anak", $regulations))>Tidak boleh bawa
+                                        <option value="tidak-boleh-bawa-anak" @selected(in_array("tidak-boleh-bawa-anak", $regulations))>Tidak boleh
+                                            bawa
                                             anak</option>
                                         <option value="tidak-untuk-pasutri" @selected(in_array("tidak-untuk-pasutri", $regulations))>Tidak untuk
                                             pasutri</option>

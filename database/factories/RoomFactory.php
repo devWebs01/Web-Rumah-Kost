@@ -25,8 +25,9 @@ class RoomFactory extends Factory
             'room_number' => $this->faker->numberBetween(1, 100),
             'price' => $this->faker->numberBetween(500_000, 2_500_000),
             // Ukuran dalam format "3x4", "4x5", dll.
-            'size' => $this->faker->numberBetween(2, 5) . 'x' . $this->faker->numberBetween(3, 6),
-            'status' => $this->faker->randomElement($statuses),
+            'size' => $this->faker->numberBetween(2, 5).'x'.$this->faker->numberBetween(3, 6),
+            // 'status' => $this->faker->randomElement($statuses),
+            'status' => 'available',
             'created_at' => now(),
             'updated_at' => now(),
         ];

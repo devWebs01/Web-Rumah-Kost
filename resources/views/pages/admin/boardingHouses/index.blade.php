@@ -68,7 +68,7 @@ $rejected = function (BoardingHouse $boardingHouse) {
                                         <td>{{ ++$no }}</td>
                                         <td>
                                             <img src="{{ Storage::url($boardingHouse->thumbnail) }}"
-                                                class="img-fluid rounded object-fit-cover" width="50px" height="50px"
+                                                class="img rounded object-fit-cover" width="50" height="50"
                                                 alt="thumbnail" />
                                         </td>
                                         <td>{{ $boardingHouse->name }}</td>

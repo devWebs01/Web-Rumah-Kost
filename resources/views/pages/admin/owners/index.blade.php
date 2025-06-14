@@ -22,7 +22,6 @@ $destroy = function (User $user) {
     $this->redirectRoute("owners.index");
 };
 
-
 ?>
 
 <x-panel-layout>
@@ -30,7 +29,7 @@ $destroy = function (User $user) {
     <x-slot name="header">
         <li class="breadcrumb-item">
             <a href="{{ route("owners.index") }}">
-                Pemilik Kost
+                Pemilik Kos
             </a>
         </li>
 

@@ -7,8 +7,40 @@
                     <div class="mb-3">
                         <label for="facilities" class="form-label">Fasilitas</label>
                         <div wire:ignore>
-                            <input type="text" wire:model="facilities" id="input-tags" aria-describedby="facilitiesId"
-                                autocomplete="facilities" />
+                            <select id="input-tags" wire:model="facilities" multiple>
+                                <option value="Balkon">Balkon</option>
+                                <option value="CCTV">CCTV</option>
+                                <option value="Dapur">Dapur</option>
+                                <option value="Dispenser">Dispenser</option>
+                                <option value="Duplikat Gerbang Kos">Duplikat Gerbang Kos</option>
+                                <option value="Gazebo">Gazebo</option>
+                                <option value="Jemuran">Jemuran</option>
+                                <option value="Joglo">Joglo</option>
+                                <option value="Jual Makanan">Jual Makanan</option>
+                                <option value="K Mandi Luar">K Mandi Luar</option>
+                                <option value="Kamar Mandi Luar - WC Duduk">Kamar Mandi Luar - WC Duduk</option>
+                                <option value="Kamar Mandi Luar - WC Jongkok">Kamar Mandi Luar - WC Jongkok</option>
+                                <option value="Kartu Akses">Kartu Akses</option>
+                                <option value="Kompor">Kompor</option>
+                                <option value="Kulkas">Kulkas</option>
+                                <option value="Laundry">Laundry</option>
+                                <option value="Loker">Loker</option>
+                                <option value="Mesin Cuci">Mesin Cuci</option>
+                                <option value="Mushola">Mushola</option>
+                                <option value="Pengurus Kos">Pengurus Kos</option>
+                                <option value="Penjaga Kos">Penjaga Kos</option>
+                                <option value="R. Cuci">R. Cuci</option>
+                                <option value="R. Jemur">R. Jemur</option>
+                                <option value="R. Keluarga">R. Keluarga</option>
+                                <option value="R. Makan">R. Makan</option>
+                                <option value="R. Santai">R. Santai</option>
+                                <option value="R. Tamu">R. Tamu</option>
+                                <option value="Rice Cooker">Rice Cooker</option>
+                                <option value="Rooftop">Rooftop</option>
+                                <option value="TV">TV</option>
+                                <option value="Taman">Taman</option>
+                                <option value="WIFI">WIFI</option>
+                            </select>
                         </div>
                         @error("facilities")
                             <small id="facilitiesId" class="form-text text-danger">{{ $message }}</small>
@@ -21,7 +53,7 @@
 
                     {{-- Aturan --}}
                     <div class="col-12 mt-3">
-                        <label for="regulation" class="form-label">Aturan Kost</label>
+                        <label for="regulation" class="form-label">Aturan Kos</label>
                         <div wire:ignore>
                             <select wire:model='regulations' multiple name="regulation" id="input-tags">
                                 <option value="5-orang-per-kamar">5 orang/ kamar</option>

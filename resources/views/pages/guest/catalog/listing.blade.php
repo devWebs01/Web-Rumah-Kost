@@ -62,7 +62,7 @@ $boardingHouses = computed(function () {
                 <div class="row g-5">
 
                     <aside class="col-lg-4">
-                        <div class="p-4 shadow-sm rounded-3 bg-light pt-5">
+                        <div class="p-4 shadow-sm border rounded-3 bg-light pt-5">
                             <h4 class="fw-bold mb-4">Filter Pencarian </h4>
 
                             {{-- Sort --}}
@@ -75,9 +75,9 @@ $boardingHouses = computed(function () {
                                     <option value="newest">Terbaru</option>
                                 </select>
                             </div>
-                            {{-- Tipe Kost --}}
+                            {{-- Tipe Kos --}}
                             <div class="mb-4">
-                                <h6 class="fw-semibold">Tipe Kost</h6>
+                                <h6 class="fw-semibold">Tipe Kos</h6>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" wire:model.live="category"
                                         value="male" id="typePutra">
@@ -126,16 +126,16 @@ $boardingHouses = computed(function () {
                     <section class="col-lg-8 pt-5">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="fw-bold mb-0">Hasil Pencarian</h3>
-                            <p class="text-muted mb-0">Menampilkan 1-5 dari 28 kost</p>
+                            <p class="text-muted mb-0">Menampilkan 1-5 dari 28 kos</p>
                         </div>
 
                         @foreach ($this->boardingHouses as $item)
-                            <div class="card kost-card mb-4 shadow-sm">
+                            <div class="card kos-card mb-4 shadow-sm">
                                 <div class="row g-0">
                                     <div class="col-md-4">
-                                        <img src="{{ $item->thumbnail ? Storage::url($item->thumbnail) : "data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\' viewBox=\'0 0 400 200\'><rect width=\'400\' height=\'200\' fill=\'%234fc3f7\' opacity=\'0.3\'/><rect x=\'50\' y=\'50\' width=\'300\' height=\'100\' fill=\'%231a73e8\' opacity=\'0.5\'/><text x=\'200\' y=\'110\' font-family=\'Arial\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23ffffff\'>Kost Nyaman</text></svg>" }}"
-                                            class="img-fluid rounded-start h-100" alt="Kamar Kost"
-                                            style="object-fit: cover;">
+                                        <img src="{{ $item->thumbnail ? Storage::url($item->thumbnail) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
+                                            class="img object-fit-cover rounded-start" alt="Kamar Kos"
+                                            style="width: 100%; height: 300px">
                                     </div>
                                     <div class="col-md-8">
                                         <div class="card-body d-flex flex-column h-100">

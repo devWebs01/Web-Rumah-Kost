@@ -86,7 +86,7 @@ state([
                             </div>
                             <div class="col-sm-5 text-end">
                                 <img src="{{ Storage::url($boardingHouse->thumbnail) }}" alt="Welcome"
-                                    class="img-fluid rounded" width="250px">
+                                    class="img object-fit-cover rounded border" width="100%" height="250">
                             </div>
                         </div>
                     </div>

@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Gallery;
 use App\Models\BoardingHouse;
+use App\Models\Gallery;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Unsplash\HttpClient as UnsplashClient;
 use Unsplash\Photo;
 
@@ -43,7 +43,7 @@ class GalleryFactory extends Factory
         }
 
         // 4. Unduh konten gambar dari Unsplash (atau DummyImage jika Unsplash gagal)
-        $filename = Str::random(12) . '.jpg';
+        $filename = Str::random(12).'.jpg';
 
         if ($imageUrl) {
             try {
@@ -57,7 +57,7 @@ class GalleryFactory extends Factory
 
         // 5. Jika Unduhan Unsplash gagal, gunakan DummyImage sebagai fallback
         if (empty($imageContents)) {
-            $dummyUrl = "https://dummyimage.com/600x400/000/bfbfbf&text=no+image";
+            $dummyUrl = 'https://dummyimage.com/600x400/000/bfbfbf&text=no+image';
             try {
                 $imageContents = @file_get_contents($dummyUrl);
             } catch (\Exception $e) {
@@ -66,13 +66,13 @@ class GalleryFactory extends Factory
         }
 
         // 6. Simpan ke disk public/galleries atau fallback ke placeholder lokal
-        if (!empty($imageContents)) {
+        if (! empty($imageContents)) {
             Storage::disk('public')->put("galleries/{$filename}", $imageContents);
             $imagePath = "galleries/{$filename}";
         } else {
             // Jika unduhan dummy juga gagal, gunakan placeholder lokal
             // (pastikan 'placeholder.jpg' sudah ada di storage/app/public/galleries/)
-            $imagePath = "galleries/placeholder.jpg";
+            $imagePath = 'galleries/placeholder.jpg';
         }
 
         // 7. Tentukan boarding_house_id (ambil secara acak atau buat baru)

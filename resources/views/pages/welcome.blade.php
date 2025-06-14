@@ -20,13 +20,13 @@ state([
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-6 hero-content">
-                            <h1 class="hero-title fade-in">Temukan Kost Ideal Anda dengan Kemudahan Digital</h1>
+                            <h1 class="hero-title fade-in">Temukan Kos Ideal Anda dengan Kemudahan Digital</h1>
                             <p class="hero-subtitle fade-in">Platform terintegrasi untuk pencarian, booking, dan manajemen
-                                kost
+                                kos
                                 secara online. Temukan hunian nyaman sesuai kebutuhan Anda.</p>
                             <div class="d-flex flex-wrap gap-3 fade-in">
-                                <a href="{{ route("catalog.listing") }}" class="btn btn-primary-custom">Cari Kost Sekarang</a>
-                                <a href="{{ route("register") }}" class="btn btn-outline-primary-custom">Daftarkan Kost
+                                <a href="{{ route("catalog.listing") }}" class="btn btn-primary-custom">Cari Kos Sekarang</a>
+                                <a href="{{ route("register") }}" class="btn btn-outline-primary-custom">Daftarkan Kos
                                     Anda</a>
                             </div>
                         </div>
@@ -71,9 +71,9 @@ state([
             <section class="py-5 bg-light-custom">
                 <div class="container py-5">
                     <div class="text-center mb-5">
-                        <h2 class="fw-bold mb-3">Mengapa Memilih E-Kost?</h2>
+                        <h2 class="fw-bold mb-3">Mengapa Memilih E-Kos?</h2>
                         <p class="text-muted mx-auto" style="max-width: 600px;">Platform kami menawarkan kemudahan dan
-                            kenyamanan dalam mencari dan mengelola kost dengan fitur-fitur terbaik.</p>
+                            kenyamanan dalam mencari dan mengelola kos dengan fitur-fitur terbaik.</p>
                     </div>
                     <div class="row g-4">
                         <div class="col-md-4">
@@ -82,7 +82,7 @@ state([
                                     <i class="bi bi-search"></i>
                                 </div>
                                 <h4 class="mb-3">Pencarian Mudah</h4>
-                                <p class="text-muted">Temukan kost ideal dengan filter lokasi, harga, dan fasilitas sesuai
+                                <p class="text-muted">Temukan kos ideal dengan filter lokasi, harga, dan fasilitas sesuai
                                     kebutuhan Anda.</p>
                             </div>
                         </div>
@@ -92,7 +92,7 @@ state([
                                     <i class="bi bi-shield-check"></i>
                                 </div>
                                 <h4 class="mb-3">Terpercaya</h4>
-                                <p class="text-muted">Semua kost telah diverifikasi untuk memastikan kenyamanan dan
+                                <p class="text-muted">Semua kos telah diverifikasi untuk memastikan kenyamanan dan
                                     keamanan
                                     penghuni.</p>
                             </div>
@@ -113,7 +113,7 @@ state([
                                     <i class="bi bi-geo-alt"></i>
                                 </div>
                                 <h4 class="mb-3">Lokasi Strategis</h4>
-                                <p class="text-muted">Pilihan kost dengan lokasi strategis dekat kampus, perkantoran, dan
+                                <p class="text-muted">Pilihan kos dengan lokasi strategis dekat kampus, perkantoran, dan
                                     fasilitas umum.</p>
                             </div>
                         </div>
@@ -123,7 +123,7 @@ state([
                                     <i class="bi bi-house-door"></i>
                                 </div>
                                 <h4 class="mb-3">Beragam Pilihan</h4>
-                                <p class="text-muted">Tersedia berbagai tipe kost dari ekonomis hingga premium sesuai
+                                <p class="text-muted">Tersedia berbagai tipe kos dari ekonomis hingga premium sesuai
                                     budget
                                     Anda.</p>
                             </div>
@@ -146,8 +146,8 @@ state([
                 <div class="container py-5">
                     <div class="d-flex justify-content-between align-items-center mb-5">
                         <div>
-                            <h2 class="fw-bold mb-2">Kost Unggulan</h2>
-                            <p class="text-muted">Temukan pilihan kost terbaik dan terpopuler</p>
+                            <h2 class="fw-bold mb-2">Kos Unggulan</h2>
+                            <p class="text-muted">Temukan pilihan kos terbaik dan terpopuler</p>
                         </div>
                         <a href="{{ route("catalog.listing") }}" class="btn btn-outline-primary-custom">Lihat Semua</a>
                     </div>
@@ -156,7 +156,7 @@ state([
                             <div class="col-md-6 col-lg-4">
                                 <div class="property-card">
                                     <div class="property-image"
-                                        style="background-image: url('{{ $item->thumbnail ? Storage::url($item->thumbnail) : "data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\' viewBox=\'0 0 400 200\'><rect width=\'400\' height=\'200\' fill=\'%234fc3f7\' opacity=\'0.3\'/><rect x=\'50\' y=\'50\' width=\'300\' height=\'100\' fill=\'%231a73e8\' opacity=\'0.5\'/><text x=\'200\' y=\'110\' font-family=\'Arial\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23ffffff\'>Kost Nyaman</text></svg>" }}');">
+                                        style="background-image: url('{{ $item->thumbnail ? Storage::url($item->thumbnail) : "data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\' viewBox=\'0 0 400 200\'><rect width=\'400\' height=\'200\' fill=\'%234fc3f7\' opacity=\'0.3\'/><rect x=\'50\' y=\'50\' width=\'300\' height=\'100\' fill=\'%231a73e8\' opacity=\'0.5\'/><text x=\'200\' y=\'110\' font-family=\'Arial\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23ffffff\'>Kos Nyaman</text></svg>" }}');">
                                         <div class="property-badge">
                                             {{ __("category." . $item->category) }}
                                         </div>
@@ -203,12 +203,12 @@ state([
                     <div class="text-center mb-5">
                         <h2 class="fw-bold mb-3">Apa Kata Mereka?</h2>
                         <p class="text-muted mx-auto" style="max-width: 600px;">Pengalaman pengguna yang telah menggunakan
-                            layanan E-Kost untuk menemukan hunian ideal mereka.</p>
+                            layanan E-Kos untuk menemukan hunian ideal mereka.</p>
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-lg-4">
                             <div class="testimonial-card">
-                                <p class="testimonial-content">"Berkat E-Kost, saya menemukan kost yang nyaman dan
+                                <p class="testimonial-content">"Berkat E-Kos, saya menemukan kos yang nyaman dan
                                     terjangkau
                                     dekat dengan kampus saya. Proses pencarian dan bookingnya sangat mudah!"</p>
                                 <div class="testimonial-author">
@@ -224,7 +224,7 @@ state([
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <div class="testimonial-card">
-                                <p class="testimonial-content">"Sebagai pemilik kost, E-Kost membantu saya mengelola
+                                <p class="testimonial-content">"Sebagai pemilik kos, E-Kos membantu saya mengelola
                                     properti
                                     dengan lebih efisien. Sistem pembayaran yang aman dan transparan sangat membantu."</p>
                                 <div class="testimonial-author">
@@ -233,14 +233,14 @@ state([
                                     </div>
                                     <div class="testimonial-info">
                                         <h5>Ratna Dewi</h5>
-                                        <p>Pemilik Kost, Bandung</p>
+                                        <p>Pemilik Kos, Bandung</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <div class="testimonial-card">
-                                <p class="testimonial-content">"Fitur filter pencarian sangat membantu saya menemukan kost
+                                <p class="testimonial-content">"Fitur filter pencarian sangat membantu saya menemukan kos
                                     yang
                                     sesuai dengan budget dan kebutuhan. Foto dan deskripsi yang detail membuat saya tidak
                                     perlu
@@ -266,13 +266,13 @@ state([
                     <div class="cta-section">
                         <div class="row align-items-center mx-5">
                             <div class="col-lg-8 text-center text-lg-start">
-                                <h2 class="cta-title">Siap Menemukan Kost Ideal Anda?</h2>
+                                <h2 class="cta-title">Siap Menemukan Kos Ideal Anda?</h2>
                                 <p class="cta-subtitle">Bergabunglah dengan ribuan pengguna yang telah menemukan hunian
                                     nyaman
                                     melalui platform kami.</p>
                             </div>
                             <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
-                                <a href="{{ route("catalog.listing") }}" class="btn btn-light btn-lg me-2">Cari Kost</a>
+                                <a href="{{ route("catalog.listing") }}" class="btn btn-light btn-lg me-2">Cari Kos</a>
                                 <a href="{{ route("register") }}" class="btn btn-outline-light btn-lg">Daftar</a>
                             </div>
                         </div>

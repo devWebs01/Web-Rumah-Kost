@@ -46,7 +46,7 @@ $create = function () {
     <x-slot name="header">
         <li class="breadcrumb-item">
             <a href="{{ route("owners.index") }}">
-                Pemilik Kost
+                Pemilik Kos
             </a>
         </li>
         <li class="breadcrumb-item">

@@ -12,7 +12,7 @@ $logout = function () {
     <div>
         <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="/">E-Kost</a>
+                <a class="navbar-brand" href="/">E-Kos</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -25,7 +25,7 @@ $logout = function () {
                         </li>
                         <li class="nav-item mx-sm-0 mx-lg-2">
                             <a class="nav-link {{ request()->routeIs("catalog.listing") ? "active text-primary fw-bold" : "" }}"
-                                href="{{ route("catalog.listing") }}">Cari Kost</a>
+                                href="{{ route("catalog.listing") }}">Cari Kos</a>
                         </li>
 
                         <li class="nav-item mx-sm-0 mx-lg-2">

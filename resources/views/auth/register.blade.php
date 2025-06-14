@@ -35,8 +35,8 @@
             <label for="role" class="form-label">{{ __("Pengguna") }}</label>
             <select class="form-select" name="role" id="role">
                 <option selected>Select one</option>
-                <option value="guest">Penyewa Kost</option>
-                <option value="owner">Pemilik Kost</option>
+                <option value="guest">Penyewa Kos</option>
+                <option value="owner">Pemilik Kos</option>
             </select>
 
             @error("role")

@@ -5,6 +5,7 @@ use function Livewire\Volt\{state, computed, on};
 use function Laravel\Folio\{name};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Carbon\Carbon;
+use App\Services\FonnteService;
 
 name("catalog.show");
 
@@ -12,7 +13,8 @@ state([
     "selectedRoom" => null,
     "boardingHouse",
 
-    //
+    "owner" => fn() => $this->boardingHouse->owner,
+
     "duration" => "",
     "check_in" => "",
     "rooms" => fn() => $this->boardingHouse->rooms->map(function ($room) {
@@ -41,12 +43,10 @@ $total = computed(function () {
 });
 
 $submitTransaction = function () {
-    // Cek apakah user login
     if (!Auth::check()) {
         return Redirect::route("login");
     }
 
-    // Validasi input
     $this->validate([
         "duration" => "required|in:1,3,6,12",
         "check_in" => "required|date",
@@ -57,25 +57,49 @@ $submitTransaction = function () {
         return;
     }
 
-    // Simpan transaksi
-    $transaction = Transaction::create([
-        "user_id" => Auth::id(),
-        "room_id" => $this->selectedRoom->id,
-        "code" => "INV-" . Carbon::today()->format("dmymsi"),
-        "check_in" => $this->check_in,
-        "check_out" => Carbon::parse($this->check_in)->addMonths($this->duration),
-        "total" => $this->total,
-    ]);
+    try {
+        $user = Auth::user();
 
-    if ($transaction) {
-        $this->selectedRoom->update(["status" => "booked"]);
+        // Buat kode transaksi yang lebih unik dan aman
+        $transactionCode = "INV-" . now()->format("dmY-His") . "-" . strtoupper(Str::random(4));
+
+        // Hitung check-out
+        $checkOut = Carbon::parse($this->check_in)->addMonths($this->duration);
+
+        // Simpan transaksi
+        $transaction = Transaction::create([
+            "user_id" => $user->id,
+            "boarding_house_id" => $this->boardingHouse->id,
+            "room_id" => $this->selectedRoom->id,
+            "code" => $transactionCode,
+            "check_in" => $this->check_in,
+            "check_out" => $checkOut,
+            "total" => $this->total,
+        ]);
+
+        if ($transaction) {
+            $this->selectedRoom->update(["status" => "booked"]);
+
+            $owner = $this->owner;
+
+            // Kirim WhatsApp (bisa dipindah ke Job bila perlu)
+            $message = "📢 *Notifikasi Transaksi Baru!*\n\n" . "📌 *Kode Transaksi:* {$transactionCode}\n" . "👤 *Penyewa:* {$user->name} (ID: {$user->id})\n" . "🏠 *Kamar:* {$this->selectedRoom->name} (ID: {$this->selectedRoom->id})\n" . "📅 *Check-in:* " . Carbon::parse($this->check_in)->translatedFormat("d F Y") . "\n" . "📅 *Check-out:* " . Carbon::parse($checkOut)->translatedFormat("d F Y") . "\n" . "💰 *Total Pembayaran:* " . formatRupiah($this->total) . "\n" . "📂 *Status:* " . __($transaction->status) . "\n\n" . "Silakan cek detail transaksi di sistem admin Anda.";
+
+            (new FonnteService())->send("628978301766", $message);
+        }
+
+        LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+        return Redirect::route("transactions.index");
+    } catch (\Throwable $th) {
+        report($th); // log error ke Laravel log
+
+        LivewireAlert::title("Proses gagal!")->position("center")->error()->toast()->show();
+
+        return Redirect::route("catalog.show", [
+            "BoardingHouse" => $this->BoardingHouse,
+        ]);
     }
-
-    // Tampilkan notifikasi
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
-
-    // Redirect ke halaman transaksi
-    return Redirect::route("transactions.index");
 };
 
 ?>
@@ -83,43 +107,30 @@ $submitTransaction = function () {
 <x-guest-layout>
     @include("components.partials.fancybox")
 
-    <style>
-        .kost-gallery img {
-            border-radius: .5rem;
-        }
-
-        .section-title {
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .card-room .badge {
-            font-size: 0.9em;
-        }
-
-        .review-stars .bi-star-fill {
-            color: #ffc107;
-            /* Warna kuning untuk bintang */
-        }
-
-        .review-stars .bi-star {
-            color: #e0e0e0;
-            /* Warna abu-abu untuk bintang kosong */
-        }
-    </style>
-
     @volt
         <div class="container my-5">
+
             <div class="row">
                 <div class="col-lg-6">
-                    <div class="kost-gallery">
-                        <img src="{{ Storage::url($boardingHouse->thumbnail) }}" class="img-fluid w-100 mb-3"
-                            alt="Foto Utama Kos">
+                    <div class="kos-gallery">
+                        <a data-fancybox
+                            data-src="{{ $boardingHouse->thumbnail ? Storage::url($boardingHouse->thumbnail) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
+                            data-caption="thumbnail">
+                            <img src="{{ $boardingHouse->thumbnail ? Storage::url($boardingHouse->thumbnail) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
+                                class="img object-fit-cover mb-3 border" alt="Foto Utama Kos" width="100%" height="500px">
+                        </a>
+
                         <div class="row g-3">
                             @foreach ($boardingHouse->galleries as $gallery)
                                 <div class="col-3">
-                                    <img src="{{ Storage::url($gallery->image) }}" class="img-fluid"
-                                        style="object-fit: cover; width: 100%; height: 100px;" alt="Foto Kamar 1">
+                                    <a data-fancybox="gallery"
+                                        data-src="{{ $gallery->image ? Storage::url($gallery->image) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
+                                        data-caption="Foto Galeri">
+                                        <img src="{{ $gallery->image ? Storage::url($gallery->image) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
+                                            class="img-fluid border" style="object-fit: cover; width: 100%; height: 100px;"
+                                            alt="Foto Galeri">
+                                    </a>
+
                                 </div>
                             @endforeach
 

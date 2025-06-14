@@ -119,20 +119,20 @@ state(["boardingHouse"]);
                                         {{-- Nama Kos --}}
                                         <div class="hstack gap-6">
                                             <i class="ti ti-home text-dark fs-6"></i>
-                                            <h6 class="mb-0">Nama Kos: {{ $boardingHouse->name }}</h6>
+                                            <h6 class="mb-0 text-break">Nama Kos: {{ $boardingHouse->name }}</h6>
                                         </div>
 
                                         {{-- Alamat --}}
                                         <div class="hstack gap-6">
                                             <i class="ti ti-map-pin text-dark fs-6"></i>
-                                            <h6 class="mb-0">Alamat: {{ $boardingHouse->address }} </h6>
+                                            <h6 class="mb-0 text-break">Alamat: {{ $boardingHouse->address }} </h6>
                                         </div>
 
                                         {{-- Peta Lokasi (link atau tampilan embed, jika URL) --}}
                                         @if ($boardingHouse->location_map)
                                             <div class="hstack gap-6">
                                                 <i class="ti ti-location text-dark fs-6"></i>
-                                                <h6 class="mb-0">
+                                                <h6 class="mb-0 text-break">
                                                     Peta Lokasi:
                                                     <a href="{{ $boardingHouse->location_map }}" target="_blank"
                                                         class="text-primary">
@@ -145,20 +145,20 @@ state(["boardingHouse"]);
                                         {{-- Kategori Kos --}}
                                         <div class="hstack gap-6">
                                             <i class="ti ti-category text-dark fs-6"></i>
-                                            <h6 class="mb-0">Kategori: {{ $boardingHouse->category }}</h6>
+                                            <h6 class="mb-0 text-break">Kategori: {{ $boardingHouse->category }}</h6>
                                         </div>
 
                                         {{-- Pemilik Kos --}}
                                         <div class="hstack gap-6">
                                             <i class="ti ti-user text-dark fs-6"></i>
-                                            <h6 class="mb-0">Pemilik: {{ $boardingHouse->owner->name }}</h6>
+                                            <h6 class="mb-0 text-break">Pemilik: {{ $boardingHouse->owner->name }}</h6>
                                         </div>
 
                                         {{-- Email Pemilik (opsional) --}}
                                         @if ($boardingHouse->owner->email)
                                             <div class="hstack gap-6">
                                                 <i class="ti ti-mail text-dark fs-6"></i>
-                                                <h6 class="mb-0">Email: {{ $boardingHouse->owner->email }}</h6>
+                                                <h6 class="mb-0 text-break">Email: {{ $boardingHouse->owner->email }}</h6>
                                             </div>
                                         @endif
                                     </div>
@@ -174,8 +174,8 @@ state(["boardingHouse"]);
                                                 <a href="{{ Storage::url($gallery->image) }}" data-fancybox="gallery">
 
                                                     <img src="{{ Storage::url($gallery->image) }}" alt="gallery-img"
-                                                        class="img object-fit-cover mb-3 rounded"
-                                                        style="width: 80px; height: 80px;">
+                                                        class="img object-fit-cover mb-3 rounded border"
+                                                        style="width: 100%; height: 80px;">
                                                 </a>
                                             </div>
                                         @empty

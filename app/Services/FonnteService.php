@@ -6,24 +6,29 @@ use Illuminate\Support\Facades\Http;
 
 class FonnteService
 {
-    protected string $baseUrl = 'https://api.fonnte.com/send';
-    protected string $token;
+    protected $token;
 
     public function __construct()
     {
-        $this->token = config('services.fonnte.token');
+        $this->token = env('FONNTE_TOKEN'); // Simpan token di config
     }
 
-    public function sendMessage(string $phone, string $message, string $countryCode = '62'): array
+    public function send($target, $message)
     {
         $response = Http::withHeaders([
             'Authorization' => $this->token,
-        ])->asForm()->post($this->baseUrl, [
-                    'target' => $phone,
-                    'message' => $message,
-                    'countryCode' => $countryCode,
-                ]);
+        ])->asForm()->post('https://api.fonnte.com/send', [
+            'target' => $this->sanitizePhone($target),
+            'message' => $message,
+            'countryCode' => '62', // Opsional
+        ]);
 
         return $response->json();
+    }
+
+    protected function sanitizePhone($phone)
+    {
+        // Ubah 08xxx jadi 628xxx
+        return preg_replace('/^0/', '62', $phone);
     }
 }

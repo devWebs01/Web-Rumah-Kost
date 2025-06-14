@@ -42,7 +42,7 @@ $logout = function () {
                         <span>
                             <i class="ti ti-alert-circle"></i>
                         </span>
-                        <span class="hide-menu">Pemilik Kost</span>
+                        <span class="hide-menu">Pemilik Kos</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
@@ -77,6 +77,14 @@ $logout = function () {
                             <i class="ti ti-layout-dashboard"></i>
                         </span>
                         <span class="hide-menu">Data Kos</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route("owner.transactions.index") }}" aria-expanded="false">
+                        <span>
+                            <i class="ti ti-layout-dashboard"></i>
+                        </span>
+                        <span class="hide-menu">Transaksi</span>
                     </a>
                 </li>
 

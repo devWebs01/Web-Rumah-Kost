@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Transaction;
 use App\Services\FonnteService;
-use App\Models\Booking;
 use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
@@ -35,11 +35,11 @@ class HomeController extends Controller
 
         $phone = $owner->identity->whatsapp_number ?? $owner->identity->phone_number;
 
-        $message = "🔔 Transaksi Baru dari {$transaction->user->name}!\n\n" .
-            "🏠 Kos: {$boardingHouse->name}\n" .
-            "📅 Tanggal Masuk: {$transaction->check_in}\n" .
-            "📆 Tanggal Keluar: {$transaction->check_out}\n" .
-            "💰 Total: Rp " . number_format($transaction->total, 0, ',', '.') . "\n" .
+        $message = "🔔 Transaksi Baru dari {$transaction->user->name}!\n\n".
+            "🏠 Kos: {$boardingHouse->name}\n".
+            "📅 Tanggal Masuk: {$transaction->check_in}\n".
+            "📆 Tanggal Keluar: {$transaction->check_out}\n".
+            '💰 Total: Rp '.number_format($transaction->total, 0, ',', '.')."\n".
             "🧾 Kode Transaksi: {$transaction->code}";
 
         try {

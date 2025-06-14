@@ -179,30 +179,31 @@ state(["transaction"]);
             <div class="row mb-5">
                 <div class="col-md-6 mb-4 mb-md-0">
                     <h6 class="text-uppercase text-muted section-title">Dari:</h6>
-                    <p class="mb-1">
+                    <p class="mb-1 text-break">
                         <strong>{{ $transaction->room->boardingHouse->name }}</strong>
                     </p>
-                    <p class="mb-1">{{ $transaction->room->boardingHouse->address }}</p>
-                    <p class="mb-1">Email: {{ $transaction->room->boardingHouse->owner->email }}</p>
+                    <p class="mb-1 text-break">Alamat: {{ $transaction->room->boardingHouse->address }}</p>
+                    <p class="mb-1 text-break">Email: {{ $transaction->room->boardingHouse->owner->email }}</p>
 
-                    <p class="mb-0">Telp: {{ $transaction->room->boardingHouse->owner->identity->phone_number ?? "-" }}
+                    <p class="mb-1 text-break">Telp:
+                        {{ $transaction->room->boardingHouse->owner->identity->phone_number ?? "-" }}
                     </p>
 
-                    <p class="mb-0">Whatsapp:
+                    <p class="mb-1 text-break">Whatsapp:
                         {{ $transaction->room->boardingHouse->owner->identity->whatsapp_number ?? "-" }}
                     </p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <h6 class="text-uppercase text-muted section-title">Untuk:</h6>
-                    <p class="mb-1">
+                    <p class="mb-1 text-break">
                         <strong>{{ $transaction->user->name }}</strong>
                     </p>
 
-                    <p class="mb-1">Alamat: {{ $transaction->user->identity->address }}</p>
-                    <p class="mb-1">Email: {{ $transaction->user->email }}</p>
+                    <p class="mb-1 text-break">Alamat: {{ $transaction->user->identity->address }}</p>
+                    <p class="mb-1 text-break">Email: {{ $transaction->user->email }}</p>
 
-                    <p class="mb-0">Telp: {{ $transaction->user->identity->phone_number ?? "-" }}</p>
-                    <p class="mb-0">Whatsapp: {{ $transaction->user->identity->whatsapp_number ?? "-" }}</p>
+                    <p class="mb-1 text-break">Telp: {{ $transaction->user->identity->phone_number ?? "-" }}</p>
+                    <p class="mb-1 text-break">Whatsapp: {{ $transaction->user->identity->whatsapp_number ?? "-" }}</p>
 
                 </div>
             </div>

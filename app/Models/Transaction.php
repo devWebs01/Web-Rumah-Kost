@@ -11,6 +11,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'user_id',
+        'boarding_house_id',
         'room_id',
         'code',
         'check_in',
@@ -25,9 +26,17 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke kos
+    // Relasi ke kamar
     public function room()
     {
         return $this->belongsTo(Room::class);
     }
+
+    // Relasi ke induk kos
+    public function boardingHouse()
+    {
+        return $this->belongsTo(BoardingHouse::class);
+    }
+
+
 }

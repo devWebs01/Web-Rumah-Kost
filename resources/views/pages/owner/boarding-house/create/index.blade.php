@@ -14,13 +14,14 @@ state([
     "user" => Auth::user(),
     "boardingHouse" => fn() => $this->user->boardingHouse ?? null,
 
-    // kost
+    // kos
     "name",
     "location_map",
     "address",
     "owner_id",
     "thumbnail",
     "category",
+    "minimum_rental_period",
 
     // Kamar
     "boarding_house_id",
@@ -109,6 +110,7 @@ $save = function () {
         "address" => "required|string",
         "thumbnail" => "required|image|mimes:jpeg,png,jpg",
         "category" => "required|in:male,female,mixed",
+        "minimum_rental_period" => "required|in:1,3,6,12",
     ]);
 
     $validatedBoardingHouse["owner_id"] = Auth::user()->id;

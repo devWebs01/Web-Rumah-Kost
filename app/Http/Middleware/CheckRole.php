@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
 class CheckRole
@@ -18,7 +17,7 @@ class CheckRole
     {
         $user = Auth::user();
 
-        if (!$user || !in_array($user->role, $roles)) {
+        if (! $user || ! in_array($user->role, $roles)) {
             // Redirect or abort if the user doesn't have the required role
             return redirect()->back()->with('error', 'Akses ditolak! Anda tidak memiliki izin.');
         }

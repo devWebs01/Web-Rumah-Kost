@@ -2,7 +2,7 @@
 <html lang="en">
 
     <head>
-        <title>{{ $title ?? "" }} - Website Pemesanan Kamar Kost</title>
+        <title>{{ $title ?? "" }} - Website Pemesanan Kamar Kos</title>
         <!-- Required meta tags -->
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -17,7 +17,6 @@
             * {
                 font-family: "DM Sans", sans-serif;
                 font-optical-sizing: auto;
-                font-weight: <weight>;
                 font-style: normal;
             }
         </style>
@@ -32,7 +31,7 @@
                     <div class="row justify-content-center align-items-center">
                         <div class="col-lg-6 mb-5 mb-lg-0">
                             <div class="pe-lg-3">
-                                <h1 class="display-5 fw-bold mb-2 mb-md-3">Temukan Kamar Kost yang
+                                <h1 class="display-5 fw-bold mb-2 mb-md-3">Temukan Kamar Kos yang
                                     <span class="text-primary">Nyaman!</span>
                                 </h1>
                                 <p class="lead mb-4">

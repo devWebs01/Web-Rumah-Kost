@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BoardingHouse>
@@ -44,11 +44,11 @@ class BoardingHouseFactory extends Factory
         } else {
             // Jika gagal unduh, gunakan placeholder
             // Pastikan file ini ada di public/storage/thumbnails/
-            $thumbnailPath = "thumbnails/placeholder.jpg";
+            $thumbnailPath = 'default.jpg';
         }
 
         return [
-            'name' => $this->faker->company . ' Kost',
+            'name' => $this->faker->company . ' Kos',
             'location_map' => 'https://goo.gl/maps/' . $this->faker->regexify('[A-Za-z0-9]{8}'),
             'address' => $this->faker->address,
             // Pastikan ada user yang tersedia
@@ -56,6 +56,7 @@ class BoardingHouseFactory extends Factory
             'thumbnail' => $thumbnailPath,
             'category' => $this->faker->randomElement($categories),
             'verification_status' => $this->faker->randomElement($statuses),
+            'minimum_rental_period' => $this->faker->randomElement(['1', '3', '6', '12']),
             'created_at' => now(),
             'updated_at' => now(),
         ];
