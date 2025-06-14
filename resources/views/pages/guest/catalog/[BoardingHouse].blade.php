@@ -14,6 +14,7 @@ state([
     "boardingHouse",
 
     "owner" => fn() => $this->boardingHouse->owner,
+    "minimum_rental_period" => fn() => $this->boardingHouse->minimum_rental_period,
 
     "duration" => "",
     "check_in" => "",
@@ -183,12 +184,25 @@ $submitTransaction = function () {
                                         <label for="duration" class="form-label">Periode Sewa</label>
                                         <select wire:model.live="duration" class="form-select form-select-sm"
                                             name="duration" id="duration">
-                                            <option selected>Pilih Durasi</option>
-                                            <option value="1">Per 1 Bulan</option>
-                                            <option value="3">Per 3 Bulan</option>
-                                            <option value="6">Per 6 Bulan</option>
-                                            <option value="12">Per 1 Tahun</option>
+                                            <option value="">Pilih Durasi</option>
+                                            <option value="1" @selected($duration == "1")
+                                                @disabled($minimum_rental_period > 1)>
+                                                Per 1 Bulan
+                                            </option>
+                                            <option value="3" @selected($duration == "3")
+                                                @disabled($minimum_rental_period > 3)>
+                                                Per 3 Bulan
+                                            </option>
+                                            <option value="6" @selected($duration == "6")
+                                                @disabled($minimum_rental_period > 6)>
+                                                Per 6 Bulan
+                                            </option>
+                                            <option value="12" @selected($duration == "12")
+                                                @disabled($minimum_rental_period > 12)>
+                                                Per 1 Tahun
+                                            </option>
                                         </select>
+
                                         @error("duration")
                                             <p id="check_in" class="mt-1 small text-danger">{{ $message }}</p>
                                         @enderror
@@ -214,9 +228,16 @@ $submitTransaction = function () {
                                             </tbody>
                                         </table>
 
-                                        <button type="submit"
-                                            class="{{ !empty($selectedRoom) ?: "disabled" }} w-100 btn btn-primary">
-                                            Submit
+                                        <button type="submit" wire:loading.attr="disabled"
+                                            class="{{ !empty($selectedRoom) ? "" : "disabled" }} w-100 btn btn-primary">
+
+                                            <span wire:loading.remove>
+                                                Submit
+                                            </span>
+
+                                            <span wire:loading>
+                                                Loading...
+                                            </span>
                                         </button>
 
                                     </div>
