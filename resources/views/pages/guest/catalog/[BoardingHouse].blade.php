@@ -14,6 +14,7 @@ state([
     "boardingHouse",
 
     "owner" => fn() => $this->boardingHouse->owner,
+    "identity" => fn() => $this->boardingHouse->owner->identity,
     "minimum_rental_period" => fn() => $this->boardingHouse->minimum_rental_period,
 
     "duration" => "",
@@ -46,6 +47,10 @@ $total = computed(function () {
 $submitTransaction = function () {
     if (!Auth::check()) {
         return Redirect::route("login");
+    }
+
+    if (!Auth()->User()->identity) {
+        return Redirect::route("profile.guest");
     }
 
     $this->validate([
@@ -81,10 +86,24 @@ $submitTransaction = function () {
         if ($transaction) {
             $this->selectedRoom->update(["status" => "booked"]);
 
-            $owner = $this->owner;
-
             // Kirim WhatsApp (bisa dipindah ke Job bila perlu)
-            $message = "📢 *Notifikasi Transaksi Baru!*\n\n" . "📌 *Kode Transaksi:* {$transactionCode}\n" . "👤 *Penyewa:* {$user->name} (ID: {$user->id})\n" . "🏠 *Kamar:* {$this->selectedRoom->name} (ID: {$this->selectedRoom->id})\n" . "📅 *Check-in:* " . Carbon::parse($this->check_in)->translatedFormat("d F Y") . "\n" . "📅 *Check-out:* " . Carbon::parse($checkOut)->translatedFormat("d F Y") . "\n" . "💰 *Total Pembayaran:* " . formatRupiah($this->total) . "\n" . "📂 *Status:* " . __($transaction->status) . "\n\n" . "Silakan cek detail transaksi di sistem admin Anda.";
+            $message = implode("\n", [
+                "Dear PIC Pemesanan Kos,\n",
+                "Berikut ini terlampir data penyewa yang melakukan pemesanan kamar kos melalui sistem:\n",
+                formatField("Kode Transaksi", $transactionCode),
+                formatField("Nama Penyewa", $user->name),
+                formatField("Nomor HP", $user->identity->phone_number),
+                formatField("Nomor Whatsapp", $user->identity->whatsapp_number),
+                formatField("Email Penyewa", $user->email) . "\n",
+                formatField("Nama Kos", $this->selectedRoom->boardingHouse->name ?? null),
+                formatField("Nomor Kamar", "Kamar " . $this->selectedRoom->room_number ?? null),
+                formatField("Jadwal Check-In", Carbon::parse($this->check_in)->translatedFormat("d-m-Y")),
+                formatField("Jadwal Check-Out", Carbon::parse($checkOut)->translatedFormat("d-m-Y")),
+                formatField("Total Pembayaran", formatRupiah($this->total)),
+                formatField("Status Transaksi", "Menunggu Konfirmasi"),
+                "\nMohon pastikan bahwa Anda telah melakukan konfirmasi ulang terhadap pemesanan kamar ini kepada pelanggan melalui Nomor HP/Whatapp Penyewa yang tertera selambat-lambatnya 1 x 24 jam.\n",
+                "Terima kasih.",
+            ]);
 
             (new FonnteService())->send("628978301766", $message);
         }
@@ -97,9 +116,7 @@ $submitTransaction = function () {
 
         LivewireAlert::title("Proses gagal!")->position("center")->error()->toast()->show();
 
-        return Redirect::route("catalog.show", [
-            "BoardingHouse" => $this->BoardingHouse,
-        ]);
+        return Redirect::back();
     }
 };
 
@@ -121,21 +138,18 @@ $submitTransaction = function () {
                                 class="img object-fit-cover mb-3 border" alt="Foto Utama Kos" width="100%" height="500px">
                         </a>
 
-                        <div class="row g-3">
+                        <div class="d-flex overflow-auto gap-2 pb-2" style="scroll-snap-type: x mandatory;">
                             @foreach ($boardingHouse->galleries as $gallery)
-                                <div class="col-3">
-                                    <a data-fancybox="gallery"
-                                        data-src="{{ $gallery->image ? Storage::url($gallery->image) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
-                                        data-caption="Foto Galeri">
-                                        <img src="{{ $gallery->image ? Storage::url($gallery->image) : "https://dummyimage.com/600x400/000/bfbfbf&text=no+image" }}"
-                                            class="img-fluid border" style="object-fit: cover; width: 100%; height: 100px;"
-                                            alt="Foto Galeri">
-                                    </a>
-
-                                </div>
+                                <a data-fancybox="gallery" data-src="{{ Storage::url($gallery->image) }}"
+                                    data-caption="Foto Galeri" class="flex-shrink-0"
+                                    style="scroll-snap-align: start; width: 120px;">
+                                    <img src="{{ Storage::url($gallery->image) }}" class="img-fluid border rounded"
+                                        style="object-fit: cover; width: 100%; height: 100px;" alt="Foto Galeri"
+                                        loading="lazy" width="120" height="100">
+                                </a>
                             @endforeach
-
                         </div>
+
                     </div>
                 </div>
 
@@ -150,10 +164,67 @@ $submitTransaction = function () {
                                 {{ $boardingHouse->address }}
                             </p>
 
-                            <a href="{{ $boardingHouse->location_map }}" target="_blank"
-                                class="btn btn-outline-primary btn-sm mb-4">
-                                <i class="bi bi-map-fill me-2">
-                                </i>Lihat di Google Maps</a>
+                            @php
+                                $owner = $boardingHouse->owner;
+                                $identity = $owner->identity ?? null;
+                            @endphp
+
+                            @if ($identity)
+                                <div class="accordion mt-4" id="accordionOwnerContact">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingContact">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapseContact"
+                                                aria-expanded="false" aria-controls="collapseContact">
+                                                Kontak Pemilik Kos
+                                            </button>
+                                        </h2>
+                                        <div id="collapseContact" class="accordion-collapse collapse"
+                                            aria-labelledby="headingContact" data-bs-parent="#accordionOwnerContact">
+                                            <div class="accordion-body">
+                                                <ul class="list-unstyled small mb-0">
+                                                    @if ($identity->phone_number)
+                                                        <li>
+                                                            <i class="bi bi-telephone me-2"></i>
+                                                            <strong>Telepon:</strong> {{ $identity->phone_number }}
+                                                        </li>
+                                                    @endif
+
+                                                    @if ($identity->whatsapp_number)
+                                                        <li>
+                                                            <i class="bi bi-whatsapp me-2"></i>
+                                                            <strong>WhatsApp:</strong>
+                                                            <a href="https://wa.me/{{ preg_replace("/[^0-9]/", "", $identity->whatsapp_number) }}"
+                                                                target="_blank"
+                                                                class="text-success text-decoration-underline">
+                                                                {{ $identity->whatsapp_number }}
+                                                            </a>
+                                                        </li>
+                                                    @endif
+
+                                                    @if ($identity->address)
+                                                        <li>
+                                                            <i class="bi bi-geo-alt me-2"></i>
+                                                            <strong>Alamat Pemilik:</strong> {{ $identity->address }}
+                                                        </li>
+                                                        <li>
+                                                            <i class="bi bi-map me-2"></i>
+                                                            <strong>Lihat di Maps:</strong>
+                                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($identity->address) }}"
+                                                                target="_blank"
+                                                                class="text-primary text-decoration-underline">
+                                                                Buka Google Maps
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-muted mt-3">Informasi kontak pemilik belum tersedia.</p>
+                            @endif
 
                             <div class="alert alert-secondary" role="alert">
                                 <p>Silakan pilih tipe kamar yang tersedia untuk melanjutkan pemesanan.</p>

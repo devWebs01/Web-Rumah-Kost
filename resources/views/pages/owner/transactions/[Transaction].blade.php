@@ -63,13 +63,13 @@ $cancelled = function () {
                         </div>
                     @else
                         <div
-                            class="alert {{ $transaction->status === "confirmed" ? "alert-success" : "alert-info" }} shadow-sm py-3 mb-0">
+                            class="alert {{ $transaction->status === "confirmed" ? "alert-success" : "alert-danger" }} shadow-sm py-3 mb-0">
                             <h5 class="alert-heading mb-2">Status Transaksi:
                                 {{ __("transaction_status." . $transaction->status) }}</h5>
                             @if ($transaction->status === "confirmed")
                                 <p class="mb-0">Transaksi ini telah berhasil dikonfirmasi. Penyewa dapat
                                     segera melakukan check-in.</p>
-                            @elseif ($transaction->status === "rejected")
+                            @elseif ($transaction->status === "cancelled")
                                 <p class="mb-0">Transaksi ini telah ditolak. Silakan hubungi penyewa jika
                                     diperlukan.</p>
                             @elseif ($transaction->status === "completed")
@@ -186,7 +186,7 @@ $cancelled = function () {
                         <div class="col-md-4 col-sm-6">
                             <p class="text-muted text-uppercase mb-1 small fw-medium">Kategori</p>
                             <p class="mb-0 fw-semibold">
-                                {{ ucfirst($transaction->boardingHouse->category ?? "N/A") }}
+                                {{ __("category." . $transaction->boardingHouse->category) }}
                             </p>
                         </div>
 
@@ -196,7 +196,7 @@ $cancelled = function () {
                             <p class="mb-0 fw-semibold">
                                 <span
                                     class="badge {{ $transaction->boardingHouse->verification_status === "verified" ? "bg-success" : "bg-secondary" }}">
-                                    {{ ucfirst($transaction->boardingHouse->verification_status ?? "Belum diverifikasi") }}
+                                    {{ __("verification_status." . $transaction->boardingHouse->verification_status) }}
                                 </span>
                             </p>
                         </div>

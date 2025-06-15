@@ -37,7 +37,7 @@ class BoardingHouseFactory extends Factory
         }
 
         // 3. Simpan ke disk public/thumbnails jika berhasil diunduh
-        $filename = Str::random(12) . '.jpg';
+        $filename = Str::random(12).'.jpg';
         if ($imageContents) {
             Storage::disk('public')->put("thumbnails/{$filename}", $imageContents);
             $thumbnailPath = "thumbnails/{$filename}";
@@ -48,8 +48,8 @@ class BoardingHouseFactory extends Factory
         }
 
         return [
-            'name' => $this->faker->company . ' Kos',
-            'location_map' => 'https://goo.gl/maps/' . $this->faker->regexify('[A-Za-z0-9]{8}'),
+            'name' => $this->faker->company.' Kos',
+            'location_map' => 'https://goo.gl/maps/'.$this->faker->regexify('[A-Za-z0-9]{8}'),
             'address' => $this->faker->address,
             // Pastikan ada user yang tersedia
             'owner_id' => User::inRandomOrder()->first()->id ?? User::factory()->create()->id,

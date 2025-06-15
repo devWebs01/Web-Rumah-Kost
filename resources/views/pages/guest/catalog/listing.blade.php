@@ -11,8 +11,10 @@ name("catalog.listing");
 state([
     "availableFacilities" => fn() => Facility::get(),
     "sort" => "",
+    "search" => "",
     "category" => [], // array of kategori tipe id (Putra, Putri, Campur)
     "facilities" => [], // array of fasilitas id
+    "all_facilities" => ["AC", "Kamar Mandi Dalam", "Wi-Fi", "Parkir Mobil", "Balkon", "CCTV", "Dapur", "Dispenser", "Duplikat Gerbang Kos", "Gazebo", "Jemuran", "Joglo", "Jual Makanan", "K Mandi Luar", "Kamar Mandi Luar - WC Duduk", "Kamar Mandi Luar - WC Jongkok", "Kartu Akses", "Kompor", "Kulkas", "Laundry", "Loker", "Mesin Cuci", "Mushola", "Pengurus Kos", "Penjaga Kos", "R. Cuci", "R. Jemur", "R. Keluarga", "R. Makan", "R. Santai", "R. Tamu", "Rice Cooker", "Rooftop", "TV", "Taman", "WIFI"], // array of fasilitas id
 ]);
 
 // Untuk dropdown filter dinamis (jika perlu)
@@ -27,11 +29,16 @@ $boardingHouses = computed(function () {
         // diasumsikan category_id sesuai id dari kategori tipe (putra, putri, campur)
         $query->whereIn("category", $this->category);
     }
+    // Filter search
+    if (!empty($this->search)) {
+        // diasumsikan search pencarian nama kos
+        $query->where("name", "like", "%" . $this->search . "%");
+    }
 
     // Filter fasilitas
     if (!empty($this->facilities)) {
-        foreach ($this->facilities as $facilityId) {
-            $query->whereHas("facilities", fn($q) => $q->where("facilities.id", $facilityId));
+        foreach ($this->facilities as $facility) {
+            $query->whereHas("facilities", fn($q) => $q->where("name", $facility));
         }
     }
 
@@ -58,12 +65,21 @@ $boardingHouses = computed(function () {
 
     @volt
         <div>
+
+            {{-- @dd($all_facilities); --}}
             <main class="container py-5">
                 <div class="row g-5">
 
                     <aside class="col-lg-4">
                         <div class="p-4 shadow-sm border rounded-3 bg-light pt-5">
                             <h4 class="fw-bold mb-4">Filter Pencarian </h4>
+
+                            <div class="mb-3">
+                                <label for="sort" class="form-label fw-semibold">Pencarian Nama Kos</label>
+
+                                <input type="search" class="form-control" wire:model.live="search" aria-describedby="search"
+                                    placeholder="Ketik Nama Kos..." />
+                            </div>
 
                             {{-- Sort --}}
                             <div class="mb-4">
@@ -98,35 +114,26 @@ $boardingHouses = computed(function () {
                             {{-- Fasilitas --}}
                             <div class="mb-4">
                                 <h6 class="fw-semibold">Fasilitas</h6>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
-                                        value="1" id="fasilitasAC">
-                                    <label class="form-check-label" for="fasilitasAC">AC</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
-                                        value="2" id="fasilitasKM">
-                                    <label class="form-check-label" for="fasilitasKM">Kamar Mandi Dalam</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
-                                        value="3" id="fasilitasWifi">
-                                    <label class="form-check-label" for="fasilitasWifi">Wi-Fi</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" wire:model.live="facilities"
-                                        value="4" id="fasilitasParkir">
-                                    <label class="form-check-label" for="fasilitasParkir">Parkir Mobil</label>
-                                </div>
+                                @foreach ($all_facilities as $facility)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" wire:model.live="facilities"
+                                            value="{{ $facility }}" id="{{ $facility }}">
+                                        <label class="form-check-label"
+                                            for="{{ $facility }}">{{ $facility }}</label>
+                                    </div>
+                                @endforeach
+
                             </div>
 
                         </div>
                     </aside>
 
                     <section class="col-lg-8 pt-5">
+
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="fw-bold mb-0">Hasil Pencarian</h3>
-                            <p class="text-muted mb-0">Menampilkan 1-5 dari 28 kos</p>
+                            <p class="text-muted mb-0">Menampilkan {{ $this->boardingHouses->firstItem() }} -
+                                {{ $this->boardingHouses->lastItem() }} dari {{ $this->boardingHouses->total() }} kos</p>
                         </div>
 
                         @foreach ($this->boardingHouses as $item)

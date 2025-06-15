@@ -10,125 +10,164 @@ use App\Models\Room;
 use App\Models\User;
 use Exception;
 use Illuminate\Database\Seeder;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class BoardingHouseSeeder extends Seeder
 {
     public function run()
     {
-        // 1. Pastikan ada beberapa User sebagai pemilik. Jika belum ada, buat 5 user.
+        $this->seedUsers();
+        $this->seedBoardingHouses();
+    }
+
+    protected function seedUsers(): void
+    {
         try {
             if (User::count() < 5) {
                 User::factory()->count(5)->create();
-                $this->command->info(' ✓ 5 User berhasil dibuat sebagai pemilik.');
+                $this->command->info('✓ 5 User berhasil dibuat sebagai pemilik.');
             } else {
-                $this->command->info(' ! Sudah ada '.User::count().' User, tidak perlu membuat baru.');
+                $this->command->info('! Sudah ada ' . User::count() . ' User, tidak perlu membuat baru.');
             }
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat User: '.$e->getMessage());
+            $this->command->error('✗ Gagal membuat User: ' . $e->getMessage());
         }
+    }
 
-        // 2. Buat 10 BoardingHouse
+    protected function seedBoardingHouses(): void
+    {
         try {
             BoardingHouse::factory()
                 ->count(10)
                 ->create()
                 ->each(function ($boardingHouse) {
-                    $this->command->info(" ✓ BoardingHouse dibuat: [ID={$boardingHouse->id}] {$boardingHouse->name}");
+                    $this->command->info("✓ BoardingHouse dibuat: [ID={$boardingHouse->id}] {$boardingHouse->name}");
 
-                    // 3. Buat 5–10 kamar untuk setiap boarding house
-                    try {
-                        $roomCount = rand(5, 10);
-                        Room::factory()
-                            ->count($roomCount)
-                            ->create([
-                                'boarding_house_id' => $boardingHouse->id,
-                            ]);
-                        $this->command->info(" ✓ {$roomCount} Room berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
-                    } catch (Exception $e) {
-                        $this->command->error("✗ Gagal membuat Room untuk BoardingHouse ID={$boardingHouse->id}: ".$e->getMessage());
-                    }
-
-                    // 4. Buat 3–6 fasilitas untuk setiap boarding house
-                    try {
-                        $facilityNames = [
-                            'Wi-Fi Gratis',
-                            'AC',
-                            'Kamar Mandi Dalam',
-                            'Dapur Bersama',
-                            'Laundry',
-                            'Parkir Motor',
-                            'Keamanan 24 Jam',
-                            'CCTV',
-                            'Air Panas',
-                            'TV Kabel',
-                            'Kulkas',
-                        ];
-                        shuffle($facilityNames);
-                        $takeFacilities = array_slice($facilityNames, 0, rand(3, 6));
-                        foreach ($takeFacilities as $name) {
-                            Facility::factory()->create([
-                                'boarding_house_id' => $boardingHouse->id,
-                                'name' => $name,
-                            ]);
-                        }
-                        $this->command->info(' ✓ '.count($takeFacilities)." Facility berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
-                    } catch (Exception $e) {
-                        $this->command->error("✗ Gagal membuat Facility untuk BoardingHouse ID={$boardingHouse->id}: ".$e->getMessage());
-                    }
-
-                    // 5. Buat 3–7 aturan (regulations) untuk setiap boarding house
-                    try {
-                        $regulationSlugs = [
-                            '5-orang-per-kamar',
-                            'maks-1-orang-per-kamar',
-                            'maks-2-orang-per-kamar',
-                            'maks-3-orang-per-kamar',
-                            'maks-4-orang-per-kamar',
-                            'akses-24-jam',
-                            'boleh-bawa-anak',
-                            'boleh-pasutri',
-                            'dilarang-merokok-di-kamar',
-                            'dilarang-bawa-hewan',
-                            'dilarang-menerima-tamu',
-                            'check-in-14-21',
-                            'check-out-maks-12',
-                            'tanpa-deposit',
-                            'termasuk-listrik',
-                            'khusus-mahasiswa',
-                            'khusus-karyawan',
-                            'swab-negatif-check-in',
-                            'pasutri-bawa-surat-nikah',
-                            'kriteria-umum',
-                            'wajib-ikut-piket',
-                        ];
-                        shuffle($regulationSlugs);
-                        $takeRegulations = array_slice($regulationSlugs, 0, rand(3, 7));
-                        foreach ($takeRegulations as $rule) {
-                            Regulation::factory()->create([
-                                'boarding_house_id' => $boardingHouse->id,
-                                'rule' => $rule,
-                            ]);
-                        }
-                        $this->command->info(' ✓ '.count($takeRegulations)." Regulation berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
-                    } catch (Exception $e) {
-                        $this->command->error("✗ Gagal membuat Regulation untuk BoardingHouse ID={$boardingHouse->id}: ".$e->getMessage());
-                    }
-
-                    // 6. Tambahkan 4–6 foto gallery per boarding house
-                    try {
-                        $galleryCount = rand(4, 6);
-                        Gallery::factory()
-                            ->count($galleryCount)
-                            ->create([
-                                'boarding_house_id' => $boardingHouse->id,
-                            ]);
-                        $this->command->info(" ✓ {$galleryCount} Gallery berhasil dibuat untuk BoardingHouse ID={$boardingHouse->id}.");
-                    } catch (Exception $e) {
-                        $this->command->error("✗ Gagal membuat Gallery untuk BoardingHouse ID={$boardingHouse->id}: ".$e->getMessage());
-                    }
+                    $this->seedRooms($boardingHouse->id);
+                    $this->seedFacilities($boardingHouse->id);
+                    $this->seedRegulations($boardingHouse->id);
+                    $this->seedGalleries($boardingHouse->id);
                 });
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat BoardingHouse: '.$e->getMessage());
+            $this->command->error('✗ Gagal membuat BoardingHouse: ' . $e->getMessage());
+        }
+    }
+
+    protected function seedRooms(int $boardingHouseId): void
+    {
+        try {
+            $roomCount = rand(5, 10);
+            Room::factory()->count($roomCount)->create([
+                'boarding_house_id' => $boardingHouseId,
+            ]);
+            $this->command->info("✓ {$roomCount} Room dibuat untuk BoardingHouse ID={$boardingHouseId}.");
+        } catch (Exception $e) {
+            $this->command->error('✗ Gagal membuat Room: ' . $e->getMessage());
+        }
+    }
+
+    protected function seedFacilities(int $boardingHouseId): void
+    {
+        try {
+            $names = [
+                'Wi-Fi Gratis',
+                'AC',
+                'Kamar Mandi Dalam',
+                'Dapur Bersama',
+                'Laundry',
+                'Parkir Motor',
+                'Keamanan 24 Jam',
+                'CCTV',
+                'Air Panas',
+                'TV Kabel',
+                'Kulkas',
+            ];
+            shuffle($names);
+            $selected = array_slice($names, 0, rand(3, 6));
+
+            foreach ($selected as $name) {
+                Facility::factory()->create([
+                    'boarding_house_id' => $boardingHouseId,
+                    'name' => $name,
+                ]);
+            }
+
+            $this->command->info('✓ ' . count($selected) . " Facility dibuat untuk BoardingHouse ID={$boardingHouseId}.");
+        } catch (Exception $e) {
+            $this->command->error('✗ Gagal membuat Facility: ' . $e->getMessage());
+        }
+    }
+
+    protected function seedRegulations(int $boardingHouseId): void
+    {
+        try {
+            $rules = [
+                '5-orang-per-kamar',
+                'maks-1-orang-per-kamar',
+                'maks-2-orang-per-kamar',
+                'maks-3-orang-per-kamar',
+                'maks-4-orang-per-kamar',
+                'akses-24-jam',
+                'boleh-bawa-anak',
+                'boleh-pasutri',
+                'dilarang-merokok-di-kamar',
+                'dilarang-bawa-hewan',
+                'dilarang-menerima-tamu',
+                'check-in-14-21',
+                'check-out-maks-12',
+                'tanpa-deposit',
+                'termasuk-listrik',
+                'khusus-mahasiswa',
+                'khusus-karyawan',
+                'swab-negatif-check-in',
+                'pasutri-bawa-surat-nikah',
+                'kriteria-umum',
+                'wajib-ikut-piket',
+            ];
+
+            shuffle($rules);
+            $selected = array_slice($rules, 0, rand(3, 7));
+
+            foreach ($selected as $rule) {
+                Regulation::factory()->create([
+                    'boarding_house_id' => $boardingHouseId,
+                    'rule' => $rule,
+                ]);
+            }
+
+            $this->command->info('✓ ' . count($selected) . " Regulation dibuat untuk BoardingHouse ID={$boardingHouseId}.");
+        } catch (Exception $e) {
+            $this->command->error('✗ Gagal membuat Regulation: ' . $e->getMessage());
+        }
+    }
+
+    protected function seedGalleries(int $boardingHouseId): void
+    {
+        try {
+            $galleryCount = rand(4, 6);
+            Gallery::factory()
+                ->count($galleryCount)
+                ->create([
+                    'boarding_house_id' => $boardingHouseId,
+                ])->each(function ($gallery) {
+                    if (!empty($gallery->image)) {
+                        $this->optimizeImage($gallery->image);
+                    }
+                });
+
+            $this->command->info("✓ {$galleryCount} Gallery dibuat untuk BoardingHouse ID={$boardingHouseId}.");
+        } catch (Exception $e) {
+            $this->command->error('✗ Gagal membuat Gallery: ' . $e->getMessage());
+        }
+    }
+
+    protected function optimizeImage(string $relativePath): void
+    {
+        $fullPath = storage_path('app/public/' . ltrim($relativePath, '/'));
+
+        if (file_exists($fullPath)) {
+            $optimizer = OptimizerChainFactory::create();
+            $optimizer->optimize($fullPath);
         }
     }
 }

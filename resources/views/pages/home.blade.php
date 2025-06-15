@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\User;
-use App\Models\BoardingHouse;
+use App\Models\{User, Transaction, BoardingHouse};
 use Illuminate\Support\Facades\Auth;
 use function Livewire\Volt\{state, mount};
 use function Laravel\Folio\{name};
@@ -9,27 +8,55 @@ use function Laravel\Folio\{name};
 name("home");
 
 state([
-    "totalKos" => fn() => BoardingHouse::count(),
-    "registrations" => fn() => User::selectRaw("DATE(created_at) as date, COUNT(*) as total")
-        ->whereBetween("created_at", [now()->subDays(30), now()])
-        ->groupBy("date")
-        ->orderBy("date")
-        ->get(),
-    "boardingHouses" => fn() => BoardingHouse::where("owner_id", Auth::User()->id)->get(),
-    "data" => fn() => $this->boardingHouses->map(function ($kos) {
-        return [
-            "name" => $kos->name,
-            "total_kamar" => $kos->rooms->count(),
-            "tersedia" => $kos->rooms->where("status", "available")->count(),
-            "terisi" => $kos->rooms->where("status", "!=", "available")->count(),
-        ];
-    }),
-    "kosByGender" => fn() => [
-        "Laki-laki" => BoardingHouse::where("category", "male")->count(),
-        "Perempuan" => BoardingHouse::where("category", "female")->count(),
-        "Campuran" => BoardingHouse::where("category", "mixed")->count(),
-    ],
-    "boardingHousePending" => fn() => BoardingHouse::where("verification_status", "pending")->get(),
+    "totalKos" => fn() => Auth::user()->role === "admin" ? BoardingHouse::count() : BoardingHouse::where("owner_id", Auth::id())->count(),
+
+    "registrations" => fn() => Auth::user()->role === "admin"
+        ? User::selectRaw("DATE(created_at) as date, COUNT(*) as total")
+            ->whereBetween("created_at", [now()->subDays(30), now()])
+            ->groupBy("date")
+            ->orderBy("date")
+            ->get()
+        : collect(), // Kosongkan jika bukan admin
+
+    "boardingHouses" => fn() => BoardingHouse::where("owner_id", Auth::id())->with("rooms")->get(),
+
+    "data" => fn() => Auth::user()->role === "owner"
+        ? BoardingHouse::where("owner_id", Auth::id())
+            ->with("rooms")
+            ->get()
+            ->map(function ($kos) {
+                return [
+                    "name" => $kos->name,
+                    "total_kamar" => $kos->rooms->count(),
+                    "tersedia" => $kos->rooms->where("status", "available")->count(),
+                    "terisi" => $kos->rooms->where("status", "!=", "available")->count(),
+                ];
+            })
+        : collect(), // Kosongkan jika bukan owner
+
+    "kosByGender" => fn() => Auth::user()->role === "admin"
+        ? [
+            "Laki-laki" => BoardingHouse::where("category", "male")->count(),
+            "Perempuan" => BoardingHouse::where("category", "female")->count(),
+            "Campuran" => BoardingHouse::where("category", "mixed")->count(),
+        ]
+        : [],
+
+    "boardingHousePending" => fn() => Auth::user()->role === "admin" ? BoardingHouse::where("verification_status", "pending")->get() : collect(),
+
+    "transactions" => fn() => Auth::user()->role === "admin"
+        ? Transaction::with(["boardingHouse", "user"])
+            ->where("status", "pending")
+            ->latest()
+            ->get()
+        : BoardingHouse::where("owner_id", Auth::id())
+            ->with([
+                "transactions" => function ($query) {
+                    $query->where("status", "pending");
+                },
+            ])
+            ->get()
+            ->flatMap(fn($kos) => $kos->transactions),
 ]);
 
 ?>
@@ -42,7 +69,7 @@ state([
 
     @volt
         <div>
-            <div class=" py-4">
+            <div class="py-4">
                 @if (Auth::User()->role === "admin")
                     <div class="row">
                         <div class="col-md-8">
@@ -58,7 +85,7 @@ state([
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 ">
                             <div class="card border">
                                 <h4 class="text-center fw-semibold card-header">Distribusi Gender Kos</h4>
                                 <div class="card-body">
@@ -160,8 +187,8 @@ state([
                         });
                     </script>
                 @else
-                    <div class="p-4">
-                        <h4>Data Kos Anda</h4>
+                    <div class="p-4 mb-3 border">
+                        <h4 class="text-center fw-semibold text-decoration-underline mt-3">Data Kos Anda</h4>
 
                         <div class="mt-4">
                             <canvas id="kosChart"></canvas>
@@ -192,8 +219,56 @@ state([
                             }
                         });
                     </script>
+
+                    <div class="card border">
+                        <h4 class="text-center fw-semibold text-decoration-underline mt-3">Data Transaksi</h4>
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+                                <table class="table table-striped text-nowrap table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Kode Transaksi</th>
+                                            <th>Tanggal Masuk</th>
+                                            <th>Tanggal Keluar</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Opsi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($transactions as $no => $transaction)
+                                            <tr>
+                                                <td>{{ ++$no }}</td>
+                                                <td>{{ $transaction->code }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($transaction->check_in)->format("d M Y") }}
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($transaction->check_out)->format("d M Y") }}
+                                                </td>
+                                                <td>{{ formatRupiah($transaction->total) }}</td>
+                                                <td>
+                                                    <span class="badge bg-primary">
+                                                        {{ __("transaction_status." . $transaction->status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <!-- Tombol aksi seperti detail, konfirmasi, dll -->
+                                                    <a href="{{ route("owner.transactions.show", ["transaction" => $transaction->id]) }}"
+                                                        class="btn btn-sm btn-info">Detail</a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
                 @endif
             </div>
+
         </div>
     @endvolt
 

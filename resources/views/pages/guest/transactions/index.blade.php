@@ -66,7 +66,7 @@ state([
                             <tbody>
                                 @forelse ($transactions as $no => $transaction)
                                     <tr>
-                                        <td>{{ $no + 1 }}..</td>
+                                        <td>{{ $no + 1 }}.</td>
                                         <td>{{ $transaction->room->boardingHouse->name }}</td>
                                         <td>
                                             <span class="badge {{ $transaction->statusClass }}">

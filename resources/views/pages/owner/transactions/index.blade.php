@@ -9,6 +9,8 @@ name("owner.transactions.index");
 state([
     "user" => Auth::user(),
     "transactions" => fn() => $this->user->boardingHouse->transactions ?? null,
+
+    "useTransactionChart" => fn() => \App\Models\Transaction::whereHas("boardingHouse", fn($q) => $q->where("owner_id", Auth::id()))->selectRaw("DATE(check_in) as date, COUNT(*) as total")->groupBy("date")->orderBy("date")->get(),
 ]);
 
 ?>
@@ -24,6 +26,13 @@ state([
 
     @volt
         <div>
+            <div class="card border mt-4">
+                <h4 class="text-center fw-semibold text-decoration-underline mt-3">Grafik Pemesanan Berdasarkan Tanggal</h4>
+                <div class="card-body">
+                    <canvas id="transactionChart"></canvas>
+                </div>
+            </div>
+
             <div class="card border">
                 <h4 class="text-center fw-semibold text-decoration-underline mt-3">Data Transaksi</h4>
                 <div class="card-body">
@@ -68,6 +77,46 @@ state([
 
                 </div>
             </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const chartData = @json($useTransactionChart);
+                const labels = chartData.map(item => item.date);
+                const data = chartData.map(item => item.total);
+
+                new Chart(document.getElementById("transactionChart"), {
+                    type: "line",
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: "Jumlah Pemesanan",
+                            data,
+                            backgroundColor: "rgba(54, 162, 235, 0.2)",
+                            borderColor: "rgba(54, 162, 235, 1)",
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: "Jumlah Transaksi"
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Tanggal"
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
         </div>
     @endvolt
 </x-panel-layout>

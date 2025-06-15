@@ -15,7 +15,6 @@ class User extends Authenticatable
 
     protected $with = ['identity'];
 
-
     /**
      * The attributes that are mass assignable.
      *

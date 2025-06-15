@@ -59,6 +59,7 @@ $destroy = function (Room $room) {
                                         <th>Harga</th>
                                         <th>Status</th>
                                         <th>Ukuran</th>
+                                        <th>Ganti Status</th>
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
@@ -75,18 +76,21 @@ $destroy = function (Room $room) {
                                             </td>
                                             <td>{{ $room->size }}</td>
                                             <td>
+                                                @if ($room->status === "available")
+                                                    <button type="button" class="btn btn-dark btn-sm"
+                                                        wire:click='unavailable({{ $room }})'>
+                                                        Tidak Tersedia
+                                                    </button>
+                                                @elseif($room->status === "unavailable")
+                                                    <button type="button" class="btn btn-success btn-sm"
+                                                        wire:click='available({{ $room }})'>
+                                                        Tersedia
+                                                    </button>
+                                                @endif
+                                            </td>
+                                            <td>
                                                 <div class="d-flex gap-3 justify-content-center">
-                                                    @if ($room->status === "available")
-                                                        <button type="button" class="btn btn-dark btn-sm"
-                                                            wire:click='unavailable({{ $room }})'>
-                                                            Tidak Tersedia
-                                                        </button>
-                                                    @else
-                                                        <button type="button" class="btn btn-success btn-sm"
-                                                            wire:click='available({{ $room }})'>
-                                                            Tersedia
-                                                        </button>
-                                                    @endif
+
                                                     <a class="btn btn-warning btn-sm"
                                                         href="{{ route("rooms.edit", ["room" => $room->id]) }}"
                                                         role="button">Edit</a>
