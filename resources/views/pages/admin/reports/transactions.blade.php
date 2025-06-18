@@ -5,13 +5,13 @@ use function Livewire\Volt\{state};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use function Laravel\Folio\{name};
 
-name("owner.transactions.index");
+name("reports.transactions");
 
 state([
     "user" => Auth::user(),
-    "transactions" => fn() => optional($this->user->boardingHouse)?->id ? Transaction::where("boarding_house_id", $this->user->boardingHouse->id)->get() : collect(),
+    "transactions" => fn() => Transaction::get(),
 
-    "useTransactionChart" => fn() => \App\Models\Transaction::whereHas("boardingHouse", fn($q) => $q->where("owner_id", Auth::id()))->selectRaw("DATE(check_in) as date, COUNT(*) as total")->groupBy("date")->orderBy("date")->get(),
+    "useTransactionChart" => fn() => Transaction::selectRaw("DATE(check_in) as date, COUNT(*) as total")->groupBy("date")->orderBy("date")->get(),
 ]);
 
 ?>
@@ -43,7 +43,7 @@ state([
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Kamar</th>
+                                    <th>Kode Transaksi</th>
                                     <th>Tanggal Masuk</th>
                                     <th>Tanggal Keluar</th>
                                     <th>Total</th>
@@ -55,7 +55,7 @@ state([
                                 @foreach ($transactions as $no => $transaction)
                                     <tr>
                                         <td>{{ ++$no }}</td>
-                                        <td>Kamar {{ $transaction->room->room_number }}</td>
+                                        <td>{{ $transaction->code }}</td>
                                         <td>{{ \Carbon\Carbon::parse($transaction->check_in)->format("d M Y") }}</td>
                                         <td>{{ \Carbon\Carbon::parse($transaction->check_out)->format("d M Y") }}</td>
                                         <td>{{ formatRupiah($transaction->total) }}</td>

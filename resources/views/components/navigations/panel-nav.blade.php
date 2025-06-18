@@ -54,14 +54,7 @@ $logout = function () {
                             <span class="hide-menu">Penyewa</span>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route("activities.index") }}" aria-expanded="false">
-                            <span>
-                                <i class="ti ti-cards"></i>
-                            </span>
-                            <span class="hide-menu">Aktifitas</span>
-                        </a>
-                    </li>
+
                     <li class="nav-small-cap">
                         <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                         <span class="hide-menu">Kos-Kosan</span>
@@ -74,6 +67,26 @@ $logout = function () {
                             <span class="hide-menu">Data Kos</span>
                         </a>
                     </li>
+                    <li class="nav-small-cap">
+                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                        <span class="hide-menu">Laporan</span>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route("reports.activities") }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-users"></i>
+                            </span>
+                            <span class="hide-menu">Aktifitas Pengguna</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route("reports.transactions") }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-calendar"></i>
+                            </span>
+                            <span class="hide-menu">Transaksi</span>
+                        </a>
+                    </li>
                 @else
                     {{-- Pemilik Kos --}}
                     <li class="nav-small-cap">
@@ -83,7 +96,7 @@ $logout = function () {
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route("boardingHouse.index") }}" aria-expanded="false">
                             <span>
-                                <i class="ti ti-layout-dashboard"></i>
+                                <i class="ti ti-home-2"></i>
                             </span>
                             <span class="hide-menu">Data Kos</span>
                         </a>
@@ -91,7 +104,7 @@ $logout = function () {
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route("owner.transactions.index") }}" aria-expanded="false">
                             <span>
-                                <i class="ti ti-layout-dashboard"></i>
+                                <i class="ti ti-moneybag"></i>
                             </span>
                             <span class="hide-menu">Transaksi</span>
                         </a>

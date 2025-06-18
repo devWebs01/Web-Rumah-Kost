@@ -21,6 +21,56 @@
                     font-weight: 500;
                 }
             }
+
+            #identity.flip-card {
+                width: 100%;
+                max-width: 400px;
+                height: 360px;
+                margin: auto;
+                perspective: 1000px;
+                cursor: pointer;
+                text-wrap: nowrap;
+            }
+
+            #identity .flip-card-inner {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: transform 0.9s;
+            }
+
+            /* Ubah ini: dari hover menjadi class flipped */
+            #identity.flipped .flip-card-inner {
+                transform: rotateY(180deg);
+            }
+
+            #identity .flip-card-front,
+            #identity .flip-card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                overflow-y: auto;
+                padding: 1rem;
+            }
+
+            #identity .flip-card-front {
+                background-color: #f8f9fa;
+                color: #212529;
+                transform: rotateY(0deg);
+            }
+
+            #identity .flip-card-back {
+                background-color: #343a40;
+                color: #ffffff;
+                transform: rotateY(180deg);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
         </style>
 
         @livewireStyles

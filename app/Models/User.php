@@ -77,4 +77,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
+    public function activities()
+    {
+        return $this->hasMany(\Spatie\Activitylog\Models\Activity::class, 'causer_id');
+    }
 }

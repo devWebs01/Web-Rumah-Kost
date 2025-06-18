@@ -36,8 +36,10 @@ $logout = function () {
                                         <i class="ti ti-user fs-6"></i>
                                         <p class="mb-0 fs-3">Profil Saya</p>
                                     </a>
-
-                                    <a wire:click="logout" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                                    <a wire:click="logout" class="d-flex align-items-center gap-2 dropdown-item">
+                                        <i class="ti ti-logout fs-6"></i>
+                                        <p class="mb-0 fs-3">Logout</p>
+                                    </a>
                                 </div>
                             </div>
                         </li>

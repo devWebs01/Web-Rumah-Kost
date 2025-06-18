@@ -1,11 +1,7 @@
 <?php
 
-use App\Models\User;
-use function Livewire\Volt\{state, usesFileUploads};
+use function Livewire\Volt\{state};
 use function Laravel\Folio\{name};
-use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
-
-usesFileUploads();
 
 name("guests.edit");
 
@@ -18,6 +14,7 @@ state([
     "id_card",
     "password",
     "user",
+    "logs" => fn() => \Spatie\Activitylog\Models\Activity::where("causer_id", $this->user->id)->latest()->take(10)->get(),
 ]);
 
 ?>
@@ -114,12 +111,40 @@ state([
 
                             </div>
                         </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Aktivitas Pengguna</h5>
+
+                            @if ($logs->count())
+                                <ul class="list-group list-group-flush">
+                                    @foreach ($logs as $log)
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <strong>{{ $log->description }}</strong><br>
+                                                    <small class="text-muted">
+                                                        {{ \Carbon\Carbon::parse($log->created_at)->translatedFormat("d M Y H:i") }}
+                                                    </small>
+                                                </div>
+                                                @if ($log->subject_type)
+                                                    <small class="text-muted text-end">
+                                                        <em>{{ class_basename($log->subject_type) }}</em>
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-muted">Belum ada aktivitas tercatat.</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="card">
                         <div class="card-body p-4">
-                            <h4 class="card-title text-center mb-3">User Profile</h4>
+                            <h4 class="card-title text-center mb-3">User Profil</h4>
                             <div class="text-center">
                                 <img src="{{ "https://api.dicebear.com/9.x/adventurer/svg?seed=" . $name ?? "https://api.dicebear.com/9.x/adventurer/svg?seed=Mason" }}"
                                     alt="modernize-img" class="img-fluid rounded-circle mb-4 border" width="120"
@@ -163,6 +188,7 @@ state([
 
                 </div>
             </div>
+
         </div>
     @endvolt
 </x-panel-layout>

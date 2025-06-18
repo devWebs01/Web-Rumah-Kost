@@ -4,7 +4,7 @@ use Spatie\Activitylog\Models\Activity;
 use function Livewire\Volt\{state};
 use function Laravel\Folio\{name};
 
-name("activities.index");
+name("reports.activities");
 
 state([
     "activities" => fn() => Activity::latest()->get(),
@@ -16,7 +16,7 @@ state([
     <x-slot name="title">Data Admin</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
-            <a href="{{ route("activities.index") }}">
+            <a href="{{ route("reports.activities") }}">
                 Log Aktifitas User
             </a>
         </li>

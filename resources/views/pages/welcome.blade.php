@@ -16,7 +16,7 @@ state([
     @volt
         <div>
             <!-- Hero Section -->
-            <section class="hero" id="home">
+            <section class="mt-5" id="home">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-6 hero-content">
@@ -102,9 +102,9 @@ state([
                                 <div class="feature-icon">
                                     <i class="bi bi-credit-card"></i>
                                 </div>
-                                <h4 class="mb-3">Pembayaran Aman</h4>
-                                <p class="text-muted">Proses pembayaran yang aman dan transparan dengan berbagai metode
-                                    pembayaran.</p>
+                                <h4 class="mb-3">Pembayaran Langsung</h4>
+                                <p class="text-muted">Proses pembayaran yang aman dan transparan langsung dengan pemilik
+                                    kos setelah melewati verifikasi admin.</p>
                             </div>
                         </div>
                         <div class="col-md-4">

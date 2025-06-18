@@ -18,6 +18,7 @@ state([
     "id_card",
     "password",
     "user",
+    "logs" => fn() => \Spatie\Activitylog\Models\Activity::where("causer_id", $this->user->id)->latest()->take(10)->get(),
 ]);
 
 $update = function () {
@@ -204,51 +205,115 @@ $update = function () {
                             </form>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-body p-4">
-                            <h4 class="card-title text-center mb-3">User Profile</h4>
-                            <div class="text-center">
-                                <img src="{{ "https://api.dicebear.com/9.x/adventurer/svg?seed=" . $name ?? "https://api.dicebear.com/9.x/adventurer/svg?seed=Mason" }}"
-                                    alt="modernize-img" class="img-fluid rounded-circle mb-4 border" width="120"
-                                    height="120">
-                            </div>
 
-                            <div class="row mb-2">
-                                <div class="col-4 text-end fw-bold">Nama:</div>
-                                <div class="col-8 mb-1">{{ $name ?? "-" }}</div>
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Aktivitas Pengguna</h5>
 
-                                <div class="col-4 text-end fw-bold">Email:</div>
-                                <div class="col-8 mb-1">{{ $email ?? "-" }}</div>
-
-                                <div class="col-4 text-end fw-bold">Telp:</div>
-                                <div class="col-8 mb-1">{{ $phone_number ?? "-" }}</div>
-
-                                <div class="col-4 text-end fw-bold">WA:</div>
-                                <div class="col-8 mb-1">{{ $whatsapp_number ?? "-" }}</div>
-
-                                <div class="col-4 text-end fw-bold">Alamat:</div>
-                                <div class="col-8 mb-1">{{ $address ?? "-" }}</div>
-                            </div>
+                            @if ($logs->count())
+                                <ul class="list-group list-group-flush">
+                                    @foreach ($logs as $log)
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <strong>{{ $log->description }}</strong><br>
+                                                    <small class="text-muted">
+                                                        {{ \Carbon\Carbon::parse($log->created_at)->translatedFormat("d M Y H:i") }}
+                                                    </small>
+                                                </div>
+                                                @if ($log->subject_type)
+                                                    <small class="text-muted text-end">
+                                                        <em>{{ class_basename($log->subject_type) }}</em>
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-muted">Belum ada aktivitas tercatat.</p>
+                            @endif
                         </div>
                     </div>
 
-                    @if ($id_card)
-                        <div class="card">
-                            <a href="{{ $id_card->temporaryUrl() }}" data-fancybox data-caption="ID Card">
-                                <img src="{{ $id_card->temporaryUrl() }}" class="card-img-top rounded" alt="id card"
-                                    width="150" height="150" style="object-fit: cover;" />
-                            </a>
+                </div>
+                <div class="col-lg-4">
+                    <!-- Flip Card: User Profile -->
+                    <div id="identity" class="flip-card"
+                        onclick="document.getElementById('identity').classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <!-- FRONT SIDE: Data Diri -->
+                            <div class="flip-card-front p-4">
+                                <h4 class="card-title text-center mb-3">Profil Pengguna</h4>
+                                <div class="text-center mb-3">
+                                    <img src="{{ "https://api.dicebear.com/9.x/adventurer/svg?seed=" . ($name ?? "Mason") }}"
+                                        alt="Avatar" class="img-fluid rounded-circle border" width="100"
+                                        height="100">
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-end fw-bold">Nama:</div>
+                                    <div class="col-8 mb-1">
+                                        <div
+                                            style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                            {{ $name ?? "-" }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4 text-end fw-bold">Email:</div>
+                                    <div class="col-8 mb-1">
+                                        <div
+                                            style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                            {{ $email ?? "-" }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4 text-end fw-bold">Telp:</div>
+                                    <div class="col-8 mb-1">
+                                        <div
+                                            style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                            {{ $phone_number ?? "-" }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4 text-end fw-bold">WA:</div>
+                                    <div class="col-8 mb-1">
+                                        <div
+                                            style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                            {{ $whatsapp_number ?? "-" }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4 text-end fw-bold">Alamat:</div>
+                                    <div class="col-8 mb-1">
+                                        <div
+                                            style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                            {{ $address ?? "-" }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- BACK SIDE: ID Card -->
+                            <div class="flip-card-back d-flex justify-content-center align-items-center">
+                                @if ($id_card)
+                                    <a href="{{ $id_card->temporaryUrl() }}" data-fancybox data-caption="ID Card">
+                                        <img src="{{ $id_card->temporaryUrl() }}" class="img-fluid rounded shadow"
+                                            alt="ID Card" style="max-height: 200px; object-fit: contain;" />
+                                    </a>
+                                @elseif(!empty($user->identity->id_card))
+                                    <a href="{{ Storage::url($user->identity->id_card) }}" data-fancybox
+                                        data-caption="ID Card">
+                                        <img src="{{ Storage::url($user->identity->id_card) }}"
+                                            class="img-fluid rounded shadow" alt="ID Card"
+                                            style="max-height: 200px; object-fit: contain;" />
+                                    </a>
+                                @else
+                                    <p class="text-white text-center">ID Card belum tersedia</p>
+                                @endif
+                            </div>
                         </div>
-                    @elseif(!empty($user->identity->id_card))
-                        <div class="card">
-                            <a href="{{ Storage::url($user->identity->id_card) }}" data-fancybox data-caption="ID Card">
-                                <img src="{{ Storage::url($user->identity->id_card) }}" class="card-img-top rounded"
-                                    alt="id card" width="150" height="150" style="object-fit: cover;" />
-                            </a>
-                        </div>
-                    @endif
+                    </div>
 
                 </div>
             </div>
