@@ -41,8 +41,16 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
+        // Buat log activity
+        activity()
+            ->causedBy($user)
+            ->withProperties([
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ])
+            ->log('User ' . $user->name . ' telah login');
 
-        if ($user->role === 'admin') {
+        if ($user->role === ['admin', 'owner']) {
 
             return redirect('/home');
         }

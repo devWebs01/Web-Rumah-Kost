@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'role' => 'guest',
+            'role' => 'owner',
         ]);
 
         \App\Models\User::factory()->create([
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
 
         // Jika Anda ingin membuat user, boarding house, dll. secara berurutan:
         $this->call([
-            // UserSeeder::class, // (jika Anda punya seeder khusus untuk user)
+                // UserSeeder::class, // (jika Anda punya seeder khusus untuk user)
             BoardingHouseSeeder::class,
         ]);
     }

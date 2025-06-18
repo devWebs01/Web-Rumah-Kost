@@ -22,7 +22,15 @@ class FolioServiceProvider extends ServiceProvider
     {
         Folio::path(resource_path('views/pages'))->middleware([
             '*' => [
-                //
+
+            ],
+            'admin/*' => [
+                'auth',
+                'checkRole:admin',
+            ],
+            'owner/*' => [
+                'auth',
+                'checkRole:owner',
             ],
         ]);
     }

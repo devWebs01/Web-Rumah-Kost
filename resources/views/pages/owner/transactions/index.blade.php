@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Transaction;
 use function Livewire\Volt\{state};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use function Laravel\Folio\{name};
@@ -8,7 +9,7 @@ name("owner.transactions.index");
 
 state([
     "user" => Auth::user(),
-    "transactions" => fn() => $this->user->boardingHouse->transactions ?? null,
+    "transactions" => fn() => optional($this->user->boardingHouse)?->id ? Transaction::where("boarding_house_id", $this->user->boardingHouse->id)->get() : collect(),
 
     "useTransactionChart" => fn() => \App\Models\Transaction::whereHas("boardingHouse", fn($q) => $q->where("owner_id", Auth::id()))->selectRaw("DATE(check_in) as date, COUNT(*) as total")->groupBy("date")->orderBy("date")->get(),
 ]);
@@ -69,6 +70,11 @@ state([
                                                 class="btn btn-sm btn-info">Detail</a>
                                         </td>
                                     </tr>
+                                    @if ($transactions === null)
+                                        <tr>
+                                            <td colspan="7"> tidak ada</td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                             </tbody>
 
