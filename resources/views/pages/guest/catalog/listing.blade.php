@@ -37,9 +37,16 @@ $boardingHouses = computed(function () {
 
     // Filter fasilitas
     if (!empty($this->facilities)) {
-        foreach ($this->facilities as $facility) {
-            $query->whereHas("facilities", fn($q) => $q->where("name", $facility));
-        }
+        $facilityCount = count($this->facilities);
+
+        $query->whereHas(
+            "facilities",
+            function ($q) {
+                $q->whereIn("name", $this->facilities);
+            },
+            ">=",
+            $facilityCount,
+        ); // Jumlah minimal fasilitas yang harus dimiliki
     }
 
     // Urutan
@@ -65,11 +72,9 @@ $boardingHouses = computed(function () {
 
     @volt
         <div>
-
             {{-- @dd($all_facilities); --}}
             <main class="container py-5">
                 <div class="row g-5">
-
                     <aside class="col-lg-4">
                         <div class="p-4 shadow-sm border rounded-3 bg-light pt-5">
                             <h4 class="fw-bold mb-4">Filter Pencarian </h4>

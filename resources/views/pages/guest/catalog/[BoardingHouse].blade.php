@@ -82,11 +82,10 @@ $submitTransaction = function () {
             "check_out" => $checkOut,
             "total" => $this->total,
         ]);
-
         if ($transaction) {
             $this->selectedRoom->update(["status" => "booked"]);
 
-            // Kirim WhatsApp (bisa dipindah ke Job bila perlu)
+            // Format pesan WhatsApp
             $message = implode("\n", [
                 "Dear PIC Pemesanan Kos,\n",
                 "Berikut ini terlampir data penyewa yang melakukan pemesanan kamar kos melalui sistem:\n",
@@ -105,7 +104,22 @@ $submitTransaction = function () {
                 "Terima kasih.",
             ]);
 
-            (new FonnteService())->send("628978301766", $message);
+            $whatsapp_number = $this->owner->identity->whatsapp_number;
+
+            try {
+                // Kirim WhatsApp (gunakan service) (ganti ke nomor pemilik kost langsung)
+                (new FonnteService())->send($whatsapp_number, $message);
+            } catch (\Throwable $e) {
+                // Log activity jika gagal kirim WA
+                activity()
+                    ->causedBy($user)
+                    ->withProperties([
+                        "exception" => $e->getMessage(),
+                        "phone" => $whatsapp_number,
+                        "message_excerpt" => substr($message, 0, 100) . "...",
+                    ])
+                    ->log("Gagal mengirim WhatsApp notifikasi pemesanan kamar.");
+            }
         }
 
         LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
