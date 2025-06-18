@@ -34,7 +34,7 @@
         <div class="mb-3">
             <label for="role" class="form-label">{{ __("Pengguna") }}</label>
             <select class="form-select" name="role" id="role">
-                <option selected>Select one</option>
+                <option selected>Pilih satu</option>
                 <option value="guest">Penyewa Kos</option>
                 <option value="owner">Pemilik Kos</option>
             </select>

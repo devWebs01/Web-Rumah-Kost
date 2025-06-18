@@ -50,11 +50,12 @@ class LoginController extends Controller
             ])
             ->log('User ' . $user->name . ' telah login');
 
-        if ($user->role === ['admin', 'owner']) {
-
+        // Perbaikan logika pengecekan role
+        if (in_array($user->role, ['admin', 'owner'])) {
             return redirect('/home');
         }
 
         return redirect('/');
+
     }
 }
