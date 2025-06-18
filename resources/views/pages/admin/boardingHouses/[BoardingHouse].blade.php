@@ -145,7 +145,8 @@ state(["boardingHouse"]);
                                         {{-- Kategori Kos --}}
                                         <div class="hstack gap-6">
                                             <i class="ti ti-category text-dark fs-6"></i>
-                                            <h6 class="mb-0 text-break">Kategori: {{ $boardingHouse->category }}</h6>
+                                            <h6 class="mb-0 text-break">Kategori:
+                                                {{ __("category." . $boardingHouse->category) }}</h6>
                                         </div>
 
                                         {{-- Pemilik Kos --}}

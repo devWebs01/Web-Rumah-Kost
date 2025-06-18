@@ -16,8 +16,32 @@ $verified = function (BoardingHouse $boardingHouse) {
         "verification_status" => "verified",
     ]);
 
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+    try {
+        $owner = $boardingHouse->owner;
 
+        if ($owner && $owner->identity && $owner->identity->whatsapp_number) {
+            $message = implode("\n", ["📢 *Verifikasi Kos Berhasil!*", "", "Kos milik Anda dengan data berikut telah *lolos verifikasi* oleh admin.", formatField("Nama Kos", $boardingHouse->name), formatField("Kategori", __("category." . $boardingHouse->category)), formatField("Alamat", $boardingHouse->address), "", "Kos Anda kini bisa ditampilkan dan dicari oleh calon penyewa.", "Terima kasih telah menggunakan layanan kami."]);
+
+            (new \App\Services\FonnteService())->send($owner->identity->whatsapp_number, $message);
+        }
+    } catch (\Throwable $e) {
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties([
+                "exception" => $e->getMessage(),
+                "boarding_house_id" => $boardingHouse->id,
+                "owner" => $owner->email ?? null,
+            ])
+            ->log("Gagal mengirim notifikasi WA verifikasi kos ke pemilik.");
+    }
+
+    // Log spesifik verifikasi
+    activity()
+        ->causedBy(Auth::user())
+        ->performedOn($boardingHouse)
+        ->log("Kos '{$boardingHouse->name}' telah *DITERIMA* oleh " . Auth::user()->name);
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
     $this->redirectRoute("boardingHouses.index");
 };
 
@@ -26,8 +50,32 @@ $rejected = function (BoardingHouse $boardingHouse) {
         "verification_status" => "rejected",
     ]);
 
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+    try {
+        $owner = $boardingHouse->owner;
 
+        if ($owner && $owner->identity && $owner->identity->whatsapp_number) {
+            $message = implode("\n", ["⚠️ *Verifikasi Kos Ditolak*", "", "Kos milik Anda *tidak lolos verifikasi* oleh admin.", formatField("Nama Kos", $boardingHouse->name), formatField("Kategori", __("category." . $boardingHouse->category)), formatField("Alamat", $boardingHouse->address), "", "Silakan periksa kembali data kos Anda dan lakukan perbaikan jika diperlukan.", "Jika ada pertanyaan, silakan hubungi admin."]);
+
+            (new \App\Services\FonnteService())->send($owner->identity->whatsapp_number, $message);
+        }
+    } catch (\Throwable $e) {
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties([
+                "exception" => $e->getMessage(),
+                "boarding_house_id" => $boardingHouse->id,
+                "owner" => $owner->email ?? null,
+            ])
+            ->log("Gagal mengirim notifikasi WA penolakan kos ke pemilik.");
+    }
+
+    // Log spesifik verifikasi
+    activity()
+        ->causedBy(Auth::user())
+        ->performedOn($boardingHouse)
+        ->log("Kos '{$boardingHouse->name}' telah *DITOLAK* oleh " . Auth::user()->name);
+
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
     $this->redirectRoute("boardingHouses.index");
 };
 

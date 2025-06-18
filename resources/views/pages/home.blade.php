@@ -10,6 +10,8 @@ name("home");
 state([
     "totalKos" => fn() => Auth::user()->role === "admin" ? BoardingHouse::count() : BoardingHouse::where("owner_id", Auth::id())->count(),
 
+    "identity" => fn() => Auth()->user()->identity ?? "",
+
     "registrations" => fn() => Auth::user()->role === "admin"
         ? User::selectRaw("DATE(created_at) as date, COUNT(*) as total")
             ->whereBetween("created_at", [now()->subDays(30), now()])
@@ -70,6 +72,21 @@ state([
     @volt
         <div>
             <div class="py-4">
+                @if (!$identity)
+                    <div class="alert alert-danger d-flex gap-2 align-items-center fw-bold text-dark" role="alert">
+                        <i class='bx bx-alert-triangle fs-5'></i>
+                        <div>
+                            Silakan lengkapi data diri Anda agar! notifikasi dapat dikirimkan langsung kepada Anda. Klik
+                            <a href="{{ Auth::User()->role === "admin" ? route("profile.admin") : route("profile.admin") }}"
+                                class="text-danger text-decoration-underline fw-bolder">
+                                link menu profil
+                            </a>
+                            berikut ini
+                        </div>
+
+                    </div>
+                @endif
+
                 @if (Auth::User()->role === "admin")
                     <div class="row">
                         <div class="col-md-8">

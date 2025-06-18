@@ -196,6 +196,24 @@ $save = function () {
         ]);
     }
 
+    try {
+        $admin = \App\Models\User::where("email", "admin@testing.com")->first();
+
+        if ($admin && $admin->identity && $admin->identity->whatsapp_number) {
+            $message = implode("\n", ["📢 *Pemberitahuan Data Kos Baru*", "", "Telah ditambahkan data kos baru oleh *{$boardingHouse->owner->name}*.", formatField("Nama Kos", $boardingHouse->name), formatField("Kategori", ucfirst($boardingHouse->category)), formatField("Alamat", $boardingHouse->address), formatField("Minimal Sewa", "{$boardingHouse->minimum_rental_period} bulan"), "", "Silakan cek detailnya di sistem admin."]);
+
+            (new \App\Services\FonnteService())->send($admin->identity->whatsapp_number, $message);
+        }
+    } catch (\Throwable $e) {
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties([
+                "exception" => $e->getMessage(),
+                "admin_email" => "admin@testing.com",
+            ])
+            ->log("Gagal mengirim notifikasi WA ke admin setelah menambahkan kos.");
+    }
+
     // Flash alert sukses
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
 
