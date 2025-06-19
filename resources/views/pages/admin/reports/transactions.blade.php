@@ -25,6 +25,8 @@ state([
         </li>
     </x-slot>
 
+    @include("components.partials.datatable")
+
     @volt
         <div>
             <div class="card border mt-4">
