@@ -29,6 +29,17 @@ return new class extends Migration
             $table->enum('minimum_rental_period', ['1', '3', '6', '12'])->default('1');
             $table->timestamps();
         });
+
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->integer('user_id')->unsigned();
+            $table->integer('boarding_house_id')->unsigned();
+            $table->text('body');
+            $table->enum('rating', [1, 2, 3, 4, 5])->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+        });
     }
 
     /**
@@ -37,5 +48,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('boarding_houses');
+        Schema::dropIfExists('comments');
+
     }
 };

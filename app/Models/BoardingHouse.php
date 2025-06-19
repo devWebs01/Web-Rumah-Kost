@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Spatie\Activitylog\LogOptions;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class BoardingHouse extends Model
 {
     use HasFactory, LogsActivity;
+
     protected static $logAttributes = ['name', 'category'];
+
     protected static $logName = 'boarding_house';
+
     protected $with = ['rooms', 'galleries', 'owner'];
 
     protected $fillable = [
@@ -65,8 +68,18 @@ class BoardingHouse extends Model
             ->useLogName('boarding_house');
     }
 
+    /**
+     * The has Many Relationship
+     *
+     * @var array
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function getDescriptionForEvent(string $eventName): string
     {
-        return "Kos {$this->name} telah {$eventName} oleh " . auth()->user()?->name;
+        return "Kos {$this->name} telah {$eventName} oleh ".auth()->user()?->name;
     }
 }

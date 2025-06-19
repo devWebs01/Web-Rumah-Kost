@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\{Room, Transaction};
+use App\Models\{Room, Transaction, Comment};
 use function Livewire\Volt\{state, computed, on};
 use function Laravel\Folio\{name};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
@@ -133,6 +133,32 @@ $submitTransaction = function () {
         return Redirect::back();
     }
 };
+
+state([ "body", "rating",]);
+
+$comment = function () {
+    $validatedComment = $this->validate([
+        "body" => "required|string|min:5",
+        "rating" => "required|in:1,2,3,4,5",
+    ]);
+
+    $validatedComment["user_id"] = auth()->user()->id;
+    $validatedComment["boarding_house_id"] = $this->boardingHouse->id;
+
+    try {
+        Comment::create($validatedComment);
+
+        LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+        return Redirect::route("catalog.show", ["boardingHouse" => $this->boardingHouse]);
+    } catch (\Throwable $th) {
+        LivewireAlert::title("Proses Gagal!")->position("center")->error()->toast()->show();
+
+        return Redirect::route("catalog.show", ["boardingHouse" => $this->boardingHouse]);
+    }
+};
+
+
 
 ?>
 

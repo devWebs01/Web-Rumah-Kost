@@ -44,7 +44,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -55,7 +55,7 @@ class UserFactory extends Factory
             if (in_array($user->role, ['owner', 'guest'])) {
                 // Generate random Unsplash photo
                 $unsplashUrl = 'https://source.unsplash.com/600x400/?id-card,document';
-                $filename = 'id_cards/' . Str::uuid() . '.jpg';
+                $filename = 'id_cards/'.Str::uuid().'.jpg';
                 $imageContents = @file_get_contents($unsplashUrl);
 
                 // Fallback dummy image if Unsplash fails
@@ -70,16 +70,16 @@ class UserFactory extends Factory
 
                 // Simpan ke storage/public/id_cards
                 $imagePath = null;
-                if (!empty($imageContents)) {
+                if (! empty($imageContents)) {
                     Storage::disk('public')->put($filename, $imageContents);
                     $imagePath = $filename;
                 }
 
                 // Buat data identity
                 $user->identity()->create([
-                    'phone_number' => '628' . fake()->numerify('#########'),
+                    'phone_number' => '628'.fake()->numerify('#########'),
                     // 'whatsapp_number' => '628'.fake()->numerify('#########'),
-                    'whatsapp_number' => "6282280514945",
+                    'whatsapp_number' => '6282280514945',
                     'id_card' => $imagePath ?? 'default.png',
                     'address' => fake()->address(),
                 ]);

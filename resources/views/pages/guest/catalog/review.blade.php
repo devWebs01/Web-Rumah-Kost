@@ -25,62 +25,34 @@
         <hr>
 
         <div class="review-list">
-            <div class="d-flex mb-3">
-                <img src="https://i.pravatar.cc/50?u=a" alt="User" class="rounded-circle me-3"
-                    style="width: 50px; height: 50px;">
-                <div>
-                    <h6 class="fw-bold mb-0">Budi Santoso</h6>
-                    <div class="review-stars small">
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
+            @foreach ($boardingHouse->comments as $comment)
+                <div class="d-flex mb-3">
+                    <img src="{{ "https://api.dicebear.com/9.x/adventurer/svg?seed=" . ($comment->user->name ?? "Mason") }}"
+                        alt="User" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                    <div>
+                        <h6 class="fw-bold mb-0">{{ $comment->user->name }}</h6>
+                        <div class="review-stars small">
+                            @for ($i = 0; $i < $comment->rating; $i++)
+                                <i class="bi bi-star-fill">
+                                </i>
+                            @endfor
+
+                        </div>
+                        <p class="mt-1">{{ $comment->body }}</p>
                     </div>
-                    <p class="mt-1">Tempatnya bersih, nyaman, dan fasilitasnya lengkap. Bapak kos ramah.
-                        Recommended!</p>
                 </div>
-            </div>
-            <div class="d-flex mb-3">
-                <img src="https://i.pravatar.cc/50?u=b" alt="User" class="rounded-circle me-3"
-                    style="width: 50px; height: 50px;">
-                <div>
-                    <h6 class="fw-bold mb-0">Citra Lestari</h6>
-                    <div class="review-stars small">
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star-fill">
-                        </i>
-                        <i class="bi bi-star">
-                        </i>
-                    </div>
-                    <p class="mt-1">Cukup baik, hanya saja sinyal WiFi kadang kurang stabil di kamar saya.
-                    </p>
-                </div>
-            </div>
+            @endforeach
+
         </div>
 
         <div class="add-review mt-4">
             <h5 class="fw-bold">Tulis Review Anda</h5>
-            <form>
-                <div class="mb-3">
-                    <label for="namaReviewer" class="form-label">Nama Anda</label>
-                    <input type="text" class="form-control" id="namaReviewer"
-                        placeholder="Masukkan nama Anda">
-                </div>
+            <form wire:submit='comment'>
+                @csrf
                 <div class="mb-3">
                     <label class="form-label">Rating</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Pilih rating bintang</option>
+                    <select class="form-select"wire:model="rating" aria-label="Default select example">
+                        <option value=" " selected>Pilih rating bintang</option>
                         <option value="5">★★★★★ (Luar Biasa)</option>
                         <option value="4">★★★★☆ (Baik)</option>
                         <option value="3">★★★☆☆ (Cukup)</option>
@@ -89,8 +61,8 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="komentar" class="form-label">Komentar Anda</label>
-                    <textarea class="form-control" id="komentar" rows="3"
+                    <label for="body" class="form-label">Komentar Anda</label>
+                    <textarea class="form-control" id="body" wire:model='body' rows="3"
                         placeholder="Bagikan pengalaman Anda menginap di sini...">
                     </textarea>
                 </div>

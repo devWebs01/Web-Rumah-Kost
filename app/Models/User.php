@@ -3,22 +3,21 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\BoardingHouse;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\hasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
-use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\hasOne;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, LogsActivity;
-    protected static $logOnlyDirty = true;
-    protected static $logAttributes = ['name', 'email'];
+    use HasApiTokens, HasFactory, LogsActivity, Notifiable;
 
+    protected static $logOnlyDirty = true;
+
+    protected static $logAttributes = ['name', 'email'];
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -77,6 +76,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
+
     public function activities()
     {
         return $this->hasMany(\Spatie\Activitylog\Models\Activity::class, 'causer_id');

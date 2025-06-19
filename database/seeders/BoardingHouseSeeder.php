@@ -27,10 +27,10 @@ class BoardingHouseSeeder extends Seeder
                 User::factory()->count(5)->create();
                 $this->command->info('✓ 5 User berhasil dibuat sebagai pemilik.');
             } else {
-                $this->command->info('! Sudah ada ' . User::count() . ' User, tidak perlu membuat baru.');
+                $this->command->info('! Sudah ada '.User::count().' User, tidak perlu membuat baru.');
             }
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat User: ' . $e->getMessage());
+            $this->command->error('✗ Gagal membuat User: '.$e->getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ class BoardingHouseSeeder extends Seeder
                     $this->seedGalleries($boardingHouse->id);
                 });
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat BoardingHouse: ' . $e->getMessage());
+            $this->command->error('✗ Gagal membuat BoardingHouse: '.$e->getMessage());
         }
     }
 
@@ -62,7 +62,7 @@ class BoardingHouseSeeder extends Seeder
             ]);
             $this->command->info("✓ {$roomCount} Room dibuat untuk BoardingHouse ID={$boardingHouseId}.");
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat Room: ' . $e->getMessage());
+            $this->command->error('✗ Gagal membuat Room: '.$e->getMessage());
         }
     }
 
@@ -92,9 +92,9 @@ class BoardingHouseSeeder extends Seeder
                 ]);
             }
 
-            $this->command->info('✓ ' . count($selected) . " Facility dibuat untuk BoardingHouse ID={$boardingHouseId}.");
+            $this->command->info('✓ '.count($selected)." Facility dibuat untuk BoardingHouse ID={$boardingHouseId}.");
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat Facility: ' . $e->getMessage());
+            $this->command->error('✗ Gagal membuat Facility: '.$e->getMessage());
         }
     }
 
@@ -135,9 +135,9 @@ class BoardingHouseSeeder extends Seeder
                 ]);
             }
 
-            $this->command->info('✓ ' . count($selected) . " Regulation dibuat untuk BoardingHouse ID={$boardingHouseId}.");
+            $this->command->info('✓ '.count($selected)." Regulation dibuat untuk BoardingHouse ID={$boardingHouseId}.");
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat Regulation: ' . $e->getMessage());
+            $this->command->error('✗ Gagal membuat Regulation: '.$e->getMessage());
         }
     }
 
@@ -150,20 +150,20 @@ class BoardingHouseSeeder extends Seeder
                 ->create([
                     'boarding_house_id' => $boardingHouseId,
                 ])->each(function ($gallery) {
-                    if (!empty($gallery->image)) {
+                    if (! empty($gallery->image)) {
                         $this->optimizeImage($gallery->image);
                     }
                 });
 
             $this->command->info("✓ {$galleryCount} Gallery dibuat untuk BoardingHouse ID={$boardingHouseId}.");
         } catch (Exception $e) {
-            $this->command->error('✗ Gagal membuat Gallery: ' . $e->getMessage());
+            $this->command->error('✗ Gagal membuat Gallery: '.$e->getMessage());
         }
     }
 
     protected function optimizeImage(string $relativePath): void
     {
-        $fullPath = storage_path('app/public/' . ltrim($relativePath, '/'));
+        $fullPath = storage_path('app/public/'.ltrim($relativePath, '/'));
 
         if (file_exists($fullPath)) {
             $optimizer = OptimizerChainFactory::create();

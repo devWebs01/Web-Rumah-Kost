@@ -48,7 +48,7 @@ class LoginController extends Controller
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ])
-            ->log('User ' . $user->name . ' telah login');
+            ->log('User '.$user->name.' telah login');
 
         // Perbaikan logika pengecekan role
         if (in_array($user->role, ['admin', 'owner'])) {

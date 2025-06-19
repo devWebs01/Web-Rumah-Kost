@@ -55,16 +55,16 @@ state([
                         <table class="table table-hover table-lg text-nowrap table-bordered rounded align-middle">
                             <thead class="table-primary">
                                 <tr>
-                                    <th scope="col" style="width: 5%;">No.</th>
-                                    <th scope="col">Kos</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Tanggal Mulai Sewa</th>
-                                    <th scope="col" class="text-end">Total</th>
-                                    <th scope="col" style="width: 10%;">Opsi</th>
+                                    <th style="width: 5%;">No.</th>
+                                    <th>Kos</th>
+                                    <th>Status</th>
+                                    <th>Tanggal Mulai Sewa</th>
+                                    <th class="text-end">Total</th>
+                                    <th style="width: 10%;">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($transactions as $no => $transaction)
+                                @foreach ($transactions as $no => $transaction)
                                     <tr>
                                         <td>{{ $no + 1 }}.</td>
                                         <td>{{ $transaction->room->boardingHouse->name }}</td>
@@ -84,13 +84,8 @@ state([
                                         </td>
 
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted fst-italic">
-                                            Anda belum memiliki transaksi.
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
+
                             </tbody>
                         </table>
                     </div>
