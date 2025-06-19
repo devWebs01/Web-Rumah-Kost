@@ -25,6 +25,8 @@ state([
         </li>
     </x-slot>
 
+    @include("components.partials.print")
+
     @volt
         <div>
             <div class="card border mt-4">

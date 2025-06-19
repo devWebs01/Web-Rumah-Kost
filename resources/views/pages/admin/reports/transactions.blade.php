@@ -25,7 +25,7 @@ state([
         </li>
     </x-slot>
 
-    @include("components.partials.datatable")
+    @include("components.partials.print")
 
     @volt
         <div>

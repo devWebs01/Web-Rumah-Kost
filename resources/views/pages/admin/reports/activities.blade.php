@@ -23,7 +23,7 @@ state([
 
     </x-slot>
 
-    @include("components.partials.datatable")
+    @include("components.partials.print")
     @volt
         <div>
             <div class="card">
