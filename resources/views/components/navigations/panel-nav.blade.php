@@ -109,6 +109,14 @@ $logout = function () {
                             <span class="hide-menu">Transaksi</span>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route("owner.comments.index") }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-moneybag"></i>
+                            </span>
+                            <span class="hide-menu">Komentar</span>
+                        </a>
+                    </li>
                 @endif
 
             </ul>

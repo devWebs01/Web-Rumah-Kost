@@ -12,6 +12,7 @@ state([
 state([
     "user" => Auth::user(),
     "boardingHouse" => fn() => $this->user->boardingHouse ?? null,
+    "identity" => fn() => Auth()->user()->identity ?? "",
 ]);
 
 ?>
@@ -28,6 +29,20 @@ state([
 
     @volt
         <div>
+            @if (!$identity)
+                <div class="alert alert-danger d-flex gap-2 align-items-center fw-bold text-dark" role="alert">
+                    <i class='bx bx-alert-triangle fs-5'></i>
+                    <div>
+                        Silakan lengkapi data diri Anda agar! notifikasi dapat dikirimkan langsung kepada Anda. Klik
+                        <a href="{{ Auth::User()->role === "admin" ? route("profile.admin") : route("profile.admin") }}"
+                            class="text-danger text-decoration-underline fw-bolder">
+                            link menu profil
+                        </a>
+                        berikut ini
+                    </div>
+
+                </div>
+            @endif
             {{-- Notifikasi jika belum ada data kos --}}
             @if (!empty($boardingHouse))
                 @if ($boardingHouse->verification_status === "rejected")

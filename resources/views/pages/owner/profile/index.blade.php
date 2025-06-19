@@ -11,7 +11,7 @@ middleware(["auth"]);
 
 usesFileUploads();
 
-name("profile.guest");
+name("profile.owner");
 
 state([
     "user" => fn() => Auth::User(),
@@ -71,12 +71,12 @@ $edit = function () {
     );
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
 
-    $this->redirectRoute("profile.guest");
+    $this->redirectRoute("profile.owner");
 };
 
 ?>
 
-<x-guest-layout>
+<x-panel-layout>
     <x-slot name="title">Profil Akun</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
@@ -95,7 +95,7 @@ $edit = function () {
                             <div class="col-9">
                                 <h4 class="fw-semibold mb-8">Data Profil Akun</h4>
                                 <p class="text-muted mb-4 fs-6">
-                                    Pada halaman edit pengguna, kamu dapat mengubah informasi pengguna.
+                                    Pada halaman profil akun, kamu dapat mengubah informasi pengguna.
                                 </p>
                             </div>
                             <div class="col-3">
@@ -178,4 +178,4 @@ $edit = function () {
 
         </div>
     @endvolt
-</x-guest-layout>
+</x-panel-layout>
