@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>E-Kos | Temukan Kos Ideal Anda</title>
+        <title>{{ $website->name ?? "" }} | Temukan Kos Ideal Anda</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
 
@@ -37,10 +37,9 @@
                             kos
                             secara online. Temukan hunian nyaman sesuai kebutuhan Anda.</p>
                         <div class="footer-social">
-                            <a href="#"><i class="bi bi-facebook"></i></a>
-                            <a href="#"><i class="bi bi-twitter"></i></a>
-                            <a href="#"><i class="bi bi-instagram"></i></a>
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
+                            <a href="{{ $website->facebook ?? "" }}"><i class="bi bi-facebook"></i></a>
+                            <a href="{{ $website->twitter ?? "" }}"><i class="bi bi-twitter"></i></a>
+                            <a href="{{ $website->instagram ?? "" }}"><i class="bi bi-instagram"></i></a>
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-6 mb-5 mb-md-0">
@@ -48,7 +47,6 @@
                         <ul class="footer-links">
                             <li><a href="/">Beranda</a></li>
                             <li><a href="{{ route("catalog.listing") }}">Cari Kos</a></li>
-                            <li><a href="#">Kontak</a></li>
                         </ul>
                     </div>
                     <div class="col-lg-2 col-md-6 mb-5 mb-md-0">
@@ -57,7 +55,6 @@
                             <li><a href="#">Pencarian Kos</a></li>
                             <li><a href="#">Booking Online</a></li>
                             <li><a href="#">Manajemen Kos</a></li>
-                            <li><a href="#">Bantuan</a></li>
                         </ul>
                     </div>
 

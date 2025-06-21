@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('regulations', function (Blueprint $table) {
             $table->id();
-            $table->text('rule');
+            $table->longText('rule');
             $table->foreignId('boarding_house_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

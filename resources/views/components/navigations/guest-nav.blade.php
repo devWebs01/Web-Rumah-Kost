@@ -28,16 +28,12 @@ $logout = function () {
                                 href="{{ route("catalog.listing") }}">Cari Kos</a>
                         </li>
 
-                        <li class="nav-item mx-sm-0 mx-lg-2">
-                            <a class="nav-link " href="#">Kontak</a>
-                        </li>
-
                         <li class="nav-item mx-sm-0 mx-lg-2 {{ Auth()->check() ?: "d-none" }}">
                             <a class="nav-link " href="{{ route("transactions.index") }}">Transaksi</a>
                         </li>
 
-                        <li class="nav-item mx-sm-0 mx-lg-2">
-                            @auth
+                        @auth
+                            <li class="nav-item mx-sm-0 mx-lg-2">
 
                                 @if (Auth::user()->role === "admin")
                                     <a class="btn btn-outline-primary" href="{{ route("home") }}">Dashboard</a>
@@ -50,13 +46,16 @@ $logout = function () {
                                         <a class="btn btn-outline-primary" wire:click="logout" href="#">Keluar</a>
                                     </div>
                                 @endif
-                            @else
-                                <div class="d-flex gap-4 mt-lg-0 mt-sm-3">
-                                    <a class="btn btn-primary" href="{{ route("register") }}">Daftar</a>
-                                    <a class="btn btn-outline-primary" href="{{ route("login") }}">Masuk</a>
-                                </div>
-                            @endauth
-                        </li>
+                            </li>
+                        @else
+                            <li class="nav-item mx-sm-0 mx-lg-2">
+                                <a class="nav-link " href="{{ route("register") }}">Daftar</a>
+                            </li>
+
+                            <li class="nav-item mx-sm-0 mx-lg-2">
+                                <a class="nav-link " href="{{ route("login") }}">Masuk</a>
+                            </li>
+                        @endauth
                     </ul>
                 </div>
             </div>

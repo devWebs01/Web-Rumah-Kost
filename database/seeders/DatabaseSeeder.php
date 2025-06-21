@@ -33,8 +33,11 @@ class DatabaseSeeder extends Seeder
 
         // Jika Anda ingin membuat user, boarding house, dll. secara berurutan:
         $this->call([
-            // UserSeeder::class, // (jika Anda punya seeder khusus untuk user)
             BoardingHouseSeeder::class,
+            WebsiteSystemSeeder::class,
         ]);
+
+        \App\Models\Comment::factory(30)->create();
+
     }
 }

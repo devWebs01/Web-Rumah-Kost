@@ -134,9 +134,21 @@ $submitTransaction = function () {
     }
 };
 
-state([ "body", "rating",]);
+state(["body", "rating"]);
 
 $comment = function () {
+    if (!Auth::check()) {
+        return Redirect::route("login");
+    }
+
+    if (!Auth()->User()->identity) {
+        return Redirect::route("profile.guest");
+    }
+
+    if (in_array(Auth()->user()->role, ["owner", "admin"])) {
+        return Redirect::route("home");
+    }
+
     $validatedComment = $this->validate([
         "body" => "required|string|min:5",
         "rating" => "required|in:1,2,3,4,5",
@@ -157,8 +169,6 @@ $comment = function () {
         return Redirect::route("catalog.show", ["boardingHouse" => $this->boardingHouse]);
     }
 };
-
-
 
 ?>
 

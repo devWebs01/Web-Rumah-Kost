@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      * 'name',
@@ -20,8 +19,8 @@ return new class extends Migration
         Schema::create('boarding_houses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('location_map');
-            $table->string('address');
+            $table->longText('location_map');
+            $table->longText('address');
             $table->string('thumbnail');
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->enum('category', ['male', 'female', 'mixed']);
