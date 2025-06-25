@@ -1,10 +1,12 @@
 <x-auth-layout>
-    <x-slot name="title">Login</x-slot>
+    <x-slot name="title">Masuk</x-slot>
+    <x-slot name="text">Silakan masuk untuk mengakses akun Anda.</x-slot>
+
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <div class="mb-3">
-            <label for="email" class="form-label">{{ __('Email') }}</label>
+            <label for="email" class="form-label">Alamat Email</label>
             <input id="email" type="email" class="form-control border px-2 @error('email') is-invalid @enderror"
                 name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
@@ -13,11 +15,10 @@
                     <strong>{{ $message }}</strong>
                 </span>
             @enderror
-
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">{{ __('Password') }}</label>
+            <label for="password" class="form-label">Kata Sandi</label>
             <input id="password" type="password"
                 class="form-control border px-2 @error('password') is-invalid @enderror" name="password" required
                 autocomplete="current-password">
@@ -27,7 +28,6 @@
                     <strong>{{ $message }}</strong>
                 </span>
             @enderror
-
         </div>
 
         <div class="mb-3 d-flex justify-content-between">
@@ -36,23 +36,23 @@
                     {{ old('remember') ? 'checked' : '' }}>
 
                 <label class="form-check-label" for="remember">
-                    {{ __('Remember Me') }}
+                    Ingat Saya
                 </label>
             </div>
             <a href="{{ route('password.request') }}" class="text-white text-decoration-none">
-                Reset Password
+                Lupa Kata Sandi?
             </a>
         </div>
 
         <div class="mb-0 d-grid">
             <button type="submit" class="btn btn-outline-light">
-                {{ __('Login') }}
+                Masuk
             </button>
 
             <div class="mt-2 text-center">
                 Belum punya akun?
                 <a class="fw-bold text-white" href="{{ route('register') }}">
-                    Buat akun!
+                    Daftar Sekarang
                 </a>
             </div>
         </div>

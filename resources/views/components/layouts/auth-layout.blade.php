@@ -35,8 +35,9 @@
                                     <span class="text-primary">Nyaman!</span>
                                 </h1>
                                 <p class="lead mb-4">
-                                    Daftar atau Masuk sekarang dan buktikan bahwa Anda adalah bagian dari komunitas
-                                    kami!
+                                    {{ $text ??
+                                        "Daftar atau Masuk sekarang dan buktikan bahwa Anda adalah bagian dari komunitas
+                                                                                                            kami!" }}
                                 </p>
                             </div>
                             <div class="row">
