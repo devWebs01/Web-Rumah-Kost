@@ -27,6 +27,12 @@
             {{ $slot }}
         </main>
 
+        <div wire:loading class="position-fixed bottom-0 end-0 m-4" style="z-index: 9999;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer>
             <div class="container">
