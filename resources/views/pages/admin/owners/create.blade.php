@@ -11,7 +11,7 @@ name("owners.create");
 
 state(["name", "email", "password", "phone_number", "whatsapp_number", "id_card", "address"]);
 
-$create = function () {
+$create = function (): void {
     $validatedUser = $this->validate([
         "name" => "required|min:5|string|max:100",
         "email" => "required|email|min:5|max:255|unique:users,email",

@@ -31,7 +31,7 @@ state([
     }),
 ]);
 
-$selectRoom = function ($roomId) {
+$selectRoom = function ($roomId): void {
     $this->selectedRoom = Room::find($roomId);
     $this->dispatch("updateTotalPrice");
 };

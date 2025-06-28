@@ -15,7 +15,7 @@ state([
     "status",
 ]);
 
-$create = function () {
+$create = function (): void {
     $validatedRoom = $this->validate([
         "room_number" => "required|string",
         "price" => "required|numeric|min:0",

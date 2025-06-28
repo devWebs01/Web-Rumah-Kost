@@ -10,7 +10,7 @@ name("admins.create");
 
 state(["name", "email", "password"]);
 
-$create = function () {
+$create = function (): void {
     $validateData = $this->validate([
         "name" => "required|min:5",
         "email" => "required|min:5|unique:users",

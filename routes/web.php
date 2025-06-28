@@ -23,7 +23,7 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/wa', function () {
+Route::get('/wa', function (): void {
     $fonnte = new \App\Services\FonnteService;
 
     $userPhone = '08978301766'; // pastikan nomor aktif & terdaftar

@@ -9,7 +9,7 @@ state([
     "rooms" => fn() => $this->user->boardingHouse->rooms ?? null,
 ]);
 
-$unavailable = function (Room $room) {
+$unavailable = function (Room $room): void {
     $room->update([
         "status" => "unavailable",
     ]);
@@ -19,7 +19,7 @@ $unavailable = function (Room $room) {
     $this->redirectRoute("boardingHouse.index");
 };
 
-$available = function (Room $room) {
+$available = function (Room $room): void {
     $room->update([
         "status" => "available",
     ]);
@@ -29,7 +29,7 @@ $available = function (Room $room) {
     $this->redirectRoute("boardingHouse.index");
 };
 
-$destroy = function (Room $room) {
+$destroy = function (Room $room): void {
     $room->delete();
 
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();

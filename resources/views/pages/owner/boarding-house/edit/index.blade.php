@@ -37,15 +37,15 @@ state([
     "prevgalleries",
 ]);
 
-$updatingGalleries = function ($value) {
+$updatingGalleries = function ($value): void {
     $this->prevgalleries = $this->galleries;
 };
 
-$updatedGalleries = function ($value) {
+$updatedGalleries = function ($value): void {
     $this->galleries = array_merge($this->prevgalleries, $value);
 };
 
-$removeItem = function ($key) {
+$removeItem = function ($key): void {
     if (isset($this->galleries[$key])) {
         $file = $this->galleries[$key];
         $file->delete();
@@ -55,7 +55,7 @@ $removeItem = function ($key) {
     $this->galleries = array_values($this->galleries);
 };
 
-$save = function () {
+$save = function (): void {
     // Validasi data boarding house
     $validatedBoardingHouse = $this->validate([
         "name" => "required|string|max:255",

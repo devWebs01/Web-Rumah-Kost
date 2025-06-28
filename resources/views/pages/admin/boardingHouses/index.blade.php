@@ -11,7 +11,7 @@ state([
     "boardingHouses" => fn() => BoardingHouse::latest()->get(),
 ]);
 
-$verified = function (BoardingHouse $boardingHouse) {
+$verified = function (BoardingHouse $boardingHouse): void {
     $boardingHouse->update([
         "verification_status" => "verified",
     ]);
@@ -45,7 +45,7 @@ $verified = function (BoardingHouse $boardingHouse) {
     $this->redirectRoute("boardingHouses.index");
 };
 
-$rejected = function (BoardingHouse $boardingHouse) {
+$rejected = function (BoardingHouse $boardingHouse): void {
     $boardingHouse->update([
         "verification_status" => "rejected",
     ]);

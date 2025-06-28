@@ -21,7 +21,7 @@ state([
     "logs" => fn() => \Spatie\Activitylog\Models\Activity::where("causer_id", $this->user->id)->latest()->take(10)->get(),
 ]);
 
-$update = function () {
+$update = function (): void {
     $user = $this->user;
 
     // Validasi data user

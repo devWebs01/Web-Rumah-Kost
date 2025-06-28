@@ -14,7 +14,7 @@ state([
         ->get(),
 ]);
 
-$destroy = function (User $user) {
+$destroy = function (User $user): void {
     $user->delete();
 
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();

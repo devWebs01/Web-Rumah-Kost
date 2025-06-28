@@ -49,19 +49,19 @@ state([
 ]);
 
 on([
-    "prevBtn_updated" => function () {
+    "prevBtn_updated" => function (): void {
         if ($this->step < 1) {
             $this->step = 1;
         }
     },
-    "nextBtn_updated" => function () {
+    "nextBtn_updated" => function (): void {
         if ($this->step > 3) {
             $this->step = 1;
         }
     },
 ]);
 
-$addRoom = function () {
+$addRoom = function (): void {
     $this->rooms[] = [
         "type" => "",
         "price" => "",
@@ -70,29 +70,29 @@ $addRoom = function () {
     ];
 };
 
-$removeRoom = function ($index) {
+$removeRoom = function ($index): void {
     array_splice($this->rooms, $index, 1);
 };
 
-$prevBtn = function () {
+$prevBtn = function (): void {
     $this->step--;
     $this->dispatch("count_step");
 };
 
-$nextBtn = function () {
+$nextBtn = function (): void {
     $this->step++;
     $this->dispatch("nextBtn_updated");
 };
 
-$updatingGalleries = function ($value) {
+$updatingGalleries = function ($value): void {
     $this->prevgalleries = $this->galleries;
 };
 
-$updatedGalleries = function ($value) {
+$updatedGalleries = function ($value): void {
     $this->galleries = array_merge($this->prevgalleries, $value);
 };
 
-$removeItem = function ($key) {
+$removeItem = function ($key): void {
     if (isset($this->galleries[$key])) {
         $file = $this->galleries[$key];
         $file->delete();
@@ -102,7 +102,7 @@ $removeItem = function ($key) {
     $this->galleries = array_values($this->galleries);
 };
 
-$save = function () {
+$save = function (): void {
     // Validasi data boarding house
     $validatedBoardingHouse = $this->validate([
         "name" => "required|string|max:255",

@@ -53,7 +53,7 @@ state([
             ->get()
         : BoardingHouse::where("owner_id", Auth::id())
             ->with([
-                "transactions" => function ($query) {
+                "transactions" => function ($query): void {
                     $query->where("status", "pending");
                 },
             ])

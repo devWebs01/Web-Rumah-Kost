@@ -9,13 +9,13 @@ name("owner.transactions.show");
 
 state(["transaction"]);
 
-$confirmed = function () {
+$confirmed = function (): void {
     $this->transaction->update([
         "status" => "confirmed",
     ]);
 };
 
-$cancelled = function () {
+$cancelled = function (): void {
     $this->transaction->update([
         "status" => "cancelled",
     ]);

@@ -26,7 +26,7 @@ state([
     "user_id" => fn() => $this->identity->user_id ?? null,
 ]);
 
-$edit = function () {
+$edit = function (): void {
     $user = $this->user;
 
     $validatedUser = $this->validate([

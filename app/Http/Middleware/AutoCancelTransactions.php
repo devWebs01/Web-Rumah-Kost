@@ -55,7 +55,7 @@ class AutoCancelTransactions
             ]);
 
             // 5. Closure untuk kirim notifikasi (WA → email fallback)
-            $notify = function ($to) use ($message, $transaction) {
+            $notify = function ($to) use ($message, $transaction): void {
                 try {
                     (new FonnteService)->send($to, $message);
                 } catch (\Throwable $e) {

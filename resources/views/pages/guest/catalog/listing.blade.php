@@ -41,7 +41,7 @@ $boardingHouses = computed(function () {
 
         $query->whereHas(
             "facilities",
-            function ($q) {
+            function ($q): void {
                 $q->whereIn("name", $this->facilities);
             },
             ">=",
