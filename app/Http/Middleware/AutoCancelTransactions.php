@@ -2,12 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-use App\Models\Transaction;
-use Carbon\Carbon;
-use App\Services\FonnteService;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\TransactionCancelledMail;
+use App\Models\Transaction;
+use App\Services\FonnteService;
+use Closure;
+use Illuminate\Support\Facades\Mail;
 
 class AutoCancelTransactions
 {
@@ -22,7 +21,7 @@ class AutoCancelTransactions
         // Ambil transaksi yang belum dikonfirmasi dan sudah melewati batas waktu
         $expiredTransactions = Transaction::with([
             'user.identity',
-            'room.boardingHouse.owner.identity'
+            'room.boardingHouse.owner.identity',
         ])
             ->where('status', 'pending')
             ->where('created_at', '<', now()->subHours(24))
@@ -47,18 +46,18 @@ class AutoCancelTransactions
 
             // 4. Susun pesan WA
             $message = implode("\n", [
-                "Halo!",
+                'Halo!',
                 "Transaksi dengan kode *{$transaction->code}* telah dibatalkan otomatis karena tidak dikonfirmasi dalam 24 jam.",
                 "Nama Penyewa: {$tenant->name}",
                 "Email Penyewa: {$tenant->email}",
-                "",
-                "Terima kasih."
+                '',
+                'Terima kasih.',
             ]);
 
             // 5. Closure untuk kirim notifikasi (WA → email fallback)
             $notify = function ($to) use ($message, $transaction) {
                 try {
-                    (new FonnteService())->send($to, $message);
+                    (new FonnteService)->send($to, $message);
                 } catch (\Throwable $e) {
                     if (filter_var($to, FILTER_VALIDATE_EMAIL)) {
                         Mail::to($to)->send(new TransactionCancelledMail($transaction));

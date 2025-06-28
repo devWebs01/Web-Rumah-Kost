@@ -1,9 +1,9 @@
 <?php
 
+use App\Models\Transaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Transaction;
 
 class TransactionCancelledMail extends Mailable
 {
