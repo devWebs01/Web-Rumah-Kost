@@ -75,7 +75,6 @@
 
         @livewireStyles
 
-        @vite([])
     </head>
 
     <body>
