@@ -5,77 +5,66 @@ namespace Database\Factories;
 use App\Models\BoardingHouse;
 use App\Models\Gallery;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Unsplash\HttpClient as UnsplashClient;
-use Unsplash\Photo;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Gallery>
+ */
 class GalleryFactory extends Factory
 {
     protected $model = Gallery::class;
 
     public function definition(): array
     {
-        // 1. Inisialisasi Unsplash Client (gunakan access key & secret dari .env)
-        UnsplashClient::init([
-            'applicationId' => env('UNSPLASH_ACCESS_KEY'),
-            'secret' => env('UNSPLASH_SECRET_KEY', ''), // kosong jika hanya butuh akses publik
-            'callbackUrl' => null,
-            'utmSource' => env('APP_NAME', 'LaravelApp'),
-        ]);
+        // 1. Siapkan beberapa provider gambar sebagai fallback
+        $seed = Str::random(8);
+        $providers = [
+            // Unsplash random interior via source.unsplash (public)
+            "https://source.unsplash.com/random/640x480?interior,room&sig={$seed}",
+            // Picsum dengan tema acak
+            "https://picsum.photos/seed/{$seed}/640/480",
+            // DummyImage sebagai fallback
+            "https://dummyimage.com/640x480/cccccc/000000&text=No+Image",
+        ];
 
-        // 2. Ambil satu foto acak dengan tema "interior room" (Ukuran 640x480)
-        try {
-            $photo = Photo::random([
-                'query' => 'interior room',
-                'w' => 640,
-                'h' => 480,
-            ]);
-        } catch (\Exception $e) {
-            $photo = null;
-        }
+        $imageContents = null;
+        $usedUrl = null;
 
-        // 3. Jika berhasil mendapatkan Photo, ambil URL "regular" atau fallback ke link unduh
-        if ($photo instanceof Photo) {
-            $imageUrl = $photo->urls['regular'] ?? ($photo->links['download'] ?? null);
-        } else {
-            $imageUrl = null;
-        }
-
-        // 4. Unduh konten gambar dari Unsplash (atau DummyImage jika Unsplash gagal)
-        $filename = Str::random(12).'.jpg';
-
-        if ($imageUrl) {
+        // 2. Coba semua provider hingga berhasil unduh
+        foreach ($providers as $url) {
             try {
-                $imageContents = @file_get_contents($imageUrl);
+                $response = Http::timeout(5)->get($url);
+                if ($response->ok()) {
+                    $imageContents = $response->body();
+                    $usedUrl = $url;
+                    break;
+                }
             } catch (\Exception $e) {
-                $imageContents = null;
-            }
-        } else {
-            $imageContents = null;
-        }
-
-        // 5. Jika Unduhan Unsplash gagal, gunakan DummyImage sebagai fallback
-        if (empty($imageContents)) {
-            $dummyUrl = 'https://dummyimage.com/600x400/000/bfbfbf&text=no+image';
-            try {
-                $imageContents = @file_get_contents($dummyUrl);
-            } catch (\Exception $e) {
-                $imageContents = null;
+                // lanjut ke provider berikutnya
             }
         }
 
-        // 6. Simpan ke disk public/galleries atau fallback ke placeholder lokal
-        if (! empty($imageContents)) {
-            Storage::disk('public')->put("galleries/{$filename}", $imageContents);
-            $imagePath = "galleries/{$filename}";
-        } else {
-            // Jika unduhan dummy juga gagal, gunakan placeholder lokal
-            // (pastikan 'placeholder.jpg' sudah ada di storage/app/public/galleries/)
-            $imagePath = 'galleries/placeholder.jpg';
+        // 3. Siapkan penyimpanan
+        $filename = Str::random(12) . '.jpg';
+        $disk = Storage::disk('public');
+        $dir = 'galleries';
+
+        if (!$disk->exists($dir)) {
+            $disk->makeDirectory($dir);
         }
 
-        // 7. Tentukan boarding_house_id (ambil secara acak atau buat baru)
+        // 4. Simpan atau gunakan placeholder lokal
+        if ($imageContents) {
+            $disk->put("{$dir}/{$filename}", $imageContents);
+            $imagePath = "{$dir}/{$filename}";
+        } else {
+            // Pastikan 'default.jpg' ada di storage/app/public/galleries/
+            $imagePath = "{$dir}/default.jpg";
+        }
+
+        // 5. Pilih boarding_house_id acak atau buat baru
         $boardingHouseId = BoardingHouse::inRandomOrder()->first()->id
             ?? BoardingHouse::factory()->create()->id;
 

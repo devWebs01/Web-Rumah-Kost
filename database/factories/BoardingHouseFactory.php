@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -19,46 +20,65 @@ class BoardingHouseFactory extends Factory
      */
     public function definition(): array
     {
-        // Kategori dan status verifikasi yang mungkin
         $categories = ['male', 'female', 'mixed'];
-        $statuses = ['pending', 'verified', 'rejected'];
+        $statuses   = ['pending', 'verified', 'rejected'];
 
-        // 1. Dapatkan URL gambar acak (Picsum)
-        //    Menggunakan seed acak agar tidak selalu sama
-        $seed = Str::random(8);
-        $url = "https://picsum.photos/seed/{$seed}/640/480";
+        // 1. Siapkan daftar URL fallback
+        $seed     = Str::random(8);
+        $providers = [
+            // Picsum (random seed)
+            "https://picsum.photos/seed/{$seed}/640/480",
+            // Unsplash random
+            "https://source.unsplash.com/random/640x480",
+            // Placeholder.com dengan teks
+            "https://via.placeholder.com/640x480.jpg?text=Kos+Image",
+        ];
 
-        // 2. Unduh konten gambarnya
-        try {
-            $imageContents = file_get_contents($url);
-        } catch (\Exception $e) {
-            // Jika gagal, gunakan placeholder lokal (atau bisa pakai URL default)
-            $imageContents = null;
+        $imageContents = null;
+        $usedUrl       = null;
+
+        // 2. Coba satu per satu sampai ok
+        foreach ($providers as $url) {
+            try {
+                $response = Http::timeout(5)->get($url);
+                if ($response->ok()) {
+                    $imageContents = $response->body();
+                    $usedUrl       = $url;
+                    break;
+                }
+            } catch (\Exception $e) {
+                // silent, lanjut ke provider berikutnya
+            }
         }
 
-        // 3. Simpan ke disk public/thumbnails jika berhasil diunduh
-        $filename = Str::random(12).'.jpg';
+        // 3. Simpan ke storage
+        $filename = Str::random(12) . '.jpg';
+        $disk     = Storage::disk('public');
+        $dir      = 'thumbnails';
+
+        if (! $disk->exists($dir)) {
+            $disk->makeDirectory($dir);
+        }
+
         if ($imageContents) {
-            Storage::disk('public')->put("thumbnails/{$filename}", $imageContents);
-            $thumbnailPath = "thumbnails/{$filename}";
+            $disk->put("{$dir}/{$filename}", $imageContents);
+            $thumbnailPath = "{$dir}/{$filename}";
         } else {
-            // Jika gagal unduh, gunakan placeholder
-            // Pastikan file ini ada di public/storage/thumbnails/
-            $thumbnailPath = 'default.jpg';
+            // fallback lokal jika semua provider gagal
+            $thumbnailPath = "{$dir}/default.jpg";
         }
 
         return [
-            'name' => $this->faker->company.' Kos',
-            'location_map' => 'https://goo.gl/maps/'.$this->faker->regexify('[A-Za-z0-9]{8}'),
-            'address' => $this->faker->address,
-            // Pastikan ada user yang tersedia
-            'owner_id' => User::inRandomOrder()->first()->id ?? User::factory()->create()->id,
-            'thumbnail' => $thumbnailPath,
-            'category' => $this->faker->randomElement($categories),
-            'verification_status' => $this->faker->randomElement($statuses),
+            'name'                  => $this->faker->company . ' Kos',
+            'location_map'          => 'https://goo.gl/maps/' . $this->faker->regexify('[A-Za-z0-9]{8}'),
+            'address'               => $this->faker->address,
+            'owner_id'              => User::inRandomOrder()->first()->id ?? User::factory()->create()->id,
+            'thumbnail'             => $thumbnailPath,
+            'category'              => $this->faker->randomElement($categories),
+            'verification_status'   => $this->faker->randomElement($statuses),
             'minimum_rental_period' => $this->faker->randomElement(['1', '3', '6', '12']),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'created_at'            => now(),
+            'updated_at'            => now(),
         ];
     }
 }
