@@ -67,6 +67,14 @@ $logout = function () {
                             <span class="hide-menu">Data Kos</span>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route("admin.comments.index") }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-command"></i>
+                            </span>
+                            <span class="hide-menu">Komentar</span>
+                        </a>
+                    </li>
                     <li class="nav-small-cap">
                         <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                         <span class="hide-menu">Laporan</span>
@@ -104,7 +112,7 @@ $logout = function () {
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route("owner.transactions.index") }}" aria-expanded="false">
                             <span>
-                                <i class="ti ti-moneybag"></i>
+                                <i class="ti ti-files"></i>
                             </span>
                             <span class="hide-menu">Transaksi</span>
                         </a>
@@ -112,7 +120,7 @@ $logout = function () {
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route("owner.comments.index") }}" aria-expanded="false">
                             <span>
-                                <i class="ti ti-moneybag"></i>
+                                <i class="ti ti-command"></i>
                             </span>
                             <span class="hide-menu">Komentar</span>
                         </a>

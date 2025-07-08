@@ -5,8 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ $website->name ?? "" }} | Temukan Kos Ideal Anda</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"
             rel="stylesheet">
         <link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
@@ -32,7 +31,6 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-
 
         <!-- Footer -->
         <footer>
@@ -87,6 +85,8 @@
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script src="https://kit.fontawesome.com/49d7584956.js" crossorigin="anonymous"></script>
 
         @livewireScripts
 

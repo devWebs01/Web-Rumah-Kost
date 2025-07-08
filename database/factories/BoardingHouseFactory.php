@@ -21,21 +21,21 @@ class BoardingHouseFactory extends Factory
     public function definition(): array
     {
         $categories = ['male', 'female', 'mixed'];
-        $statuses   = ['pending', 'verified', 'rejected'];
+        $statuses = ['pending', 'verified', 'rejected'];
 
         // 1. Siapkan daftar URL fallback
-        $seed     = Str::random(8);
+        $seed = Str::random(8);
         $providers = [
             // Picsum (random seed)
             "https://picsum.photos/seed/{$seed}/640/480",
             // Unsplash random
-            "https://source.unsplash.com/random/640x480",
+            'https://source.unsplash.com/random/640x480',
             // Placeholder.com dengan teks
-            "https://via.placeholder.com/640x480.jpg?text=Kos+Image",
+            'https://via.placeholder.com/640x480.jpg?text=Kos+Image',
         ];
 
         $imageContents = null;
-        $usedUrl       = null;
+        $usedUrl = null;
 
         // 2. Coba satu per satu sampai ok
         foreach ($providers as $url) {
@@ -43,7 +43,7 @@ class BoardingHouseFactory extends Factory
                 $response = Http::timeout(5)->get($url);
                 if ($response->ok()) {
                     $imageContents = $response->body();
-                    $usedUrl       = $url;
+                    $usedUrl = $url;
                     break;
                 }
             } catch (\Exception $e) {
@@ -52,9 +52,9 @@ class BoardingHouseFactory extends Factory
         }
 
         // 3. Simpan ke storage
-        $filename = Str::random(12) . '.jpg';
-        $disk     = Storage::disk('public');
-        $dir      = 'thumbnails';
+        $filename = Str::random(12).'.jpg';
+        $disk = Storage::disk('public');
+        $dir = 'thumbnails';
 
         if (! $disk->exists($dir)) {
             $disk->makeDirectory($dir);
@@ -69,16 +69,16 @@ class BoardingHouseFactory extends Factory
         }
 
         return [
-            'name'                  => $this->faker->company . ' Kos',
-            'location_map'          => 'https://goo.gl/maps/' . $this->faker->regexify('[A-Za-z0-9]{8}'),
-            'address'               => $this->faker->address,
-            'owner_id'              => User::inRandomOrder()->first()->id ?? User::factory()->create()->id,
-            'thumbnail'             => $thumbnailPath,
-            'category'              => $this->faker->randomElement($categories),
-            'verification_status'   => $this->faker->randomElement($statuses),
+            'name' => $this->faker->company.' Kos',
+            'location_map' => 'https://goo.gl/maps/'.$this->faker->regexify('[A-Za-z0-9]{8}'),
+            'address' => $this->faker->address,
+            'owner_id' => User::inRandomOrder()->first()->id ?? User::factory()->create()->id,
+            'thumbnail' => $thumbnailPath,
+            'category' => $this->faker->randomElement($categories),
+            'verification_status' => $this->faker->randomElement($statuses),
             'minimum_rental_period' => $this->faker->randomElement(['1', '3', '6', '12']),
-            'created_at'            => now(),
-            'updated_at'            => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

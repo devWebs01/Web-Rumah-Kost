@@ -93,8 +93,10 @@
                 <!-- Sidebar scroll-->
                 <div>
                     <div class="brand-logo d-flex align-items-center justify-content-between">
-                        <a href="/" class="text-nowrap logo-img">
-                            {{ $website->name }}
+                        <a href="/home" class="text-nowrap logo-img">
+                            <span class="fw-bolder text-center text-primary fs-6">
+                                {{ strtoupper($website->name) }}
+                            </span>
                         </a>
                         <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                             <i class="ti ti-x fs-8"></i>

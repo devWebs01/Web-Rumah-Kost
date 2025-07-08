@@ -25,7 +25,7 @@
         <hr>
 
         <div class="review-list">
-            @foreach ($boardingHouse->comments as $comment)
+            @foreach ($boardingHouse->comments->where("status", true) as $comment)
                 <div class="d-flex mb-3">
                     <img src="{{ "https://api.dicebear.com/9.x/adventurer/svg?seed=" . ($comment->user->name ?? "Mason") }}"
                         alt="User" class="rounded-circle me-3" style="width: 50px; height: 50px;">

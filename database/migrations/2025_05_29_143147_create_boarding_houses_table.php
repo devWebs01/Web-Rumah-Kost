@@ -36,6 +36,7 @@ return new class extends Migration
             $table->integer('boarding_house_id')->unsigned();
             $table->text('body');
             $table->enum('rating', [1, 2, 3, 4, 5])->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
             $table->softDeletes();
 

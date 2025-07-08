@@ -76,18 +76,15 @@ $destroy = function (Room $room) {
                                             </td>
                                             <td>{{ $room->size }}</td>
                                             <td>
-                                                @if ($room->status === "available")
-                                                    <button type="button" class="btn btn-dark btn-sm"
-                                                        wire:click='unavailable({{ $room }})'>
-                                                        Tidak Tersedia
-                                                    </button>
-                                                @elseif($room->status === "unavailable")
-                                                    <button type="button" class="btn btn-success btn-sm"
-                                                        wire:click='available({{ $room }})'>
-                                                        Tersedia
-                                                    </button>
-                                                @endif
+                                                <div class="form-check form-switch" style="    justify-self: center;">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        id="statusSwitch{{ $room->id }}"
+                                                        wire:change="{{ $room->status === "available" ? "unavailable(" . $room->id . ")" : "available(" . $room->id . ")" }}"
+                                                        @if ($room->status === "available") checked @endif>
+
+                                                </div>
                                             </td>
+
                                             <td>
                                                 <div class="d-flex gap-3 justify-content-center">
 

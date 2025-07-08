@@ -1,16 +1,30 @@
 <?php
 
 use function Livewire\Volt\{state};
-use App\Models\{Room};
+use App\Models\{Comment};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use function Laravel\Folio\{name};
 
-name("owner.comments.index");
+name("admin.comments.index");
 
 state([
     "user" => Auth::user(),
-    "comments" => fn() => $this->user->boardingHouse->comments ?? collect(),
+    "comments" => fn() => Comment::get() ?? collect(),
 ]);
+
+$toggleStatus = function ($commentId) {
+    $comment = Comment::findOrFail($commentId);
+    $comment->status = !$comment->status; // Toggle status
+    $comment->save();
+
+    $this->redirectRoute("admin.comments.index");
+};
+
+$delete = function ($commentId) {
+    $comment = Comment::findOrFail($commentId);
+    $comment->delete();
+    $this->redirectRoute("admin.comments.index");
+};
 
 ?>
 
@@ -30,7 +44,7 @@ state([
                 <div class="card-body">
 
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered">
+                        <table class="table table-striped table-bordered text-nowrap">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -39,6 +53,7 @@ state([
                                     <th>Rating</th>
                                     <th>Status</th>
                                     <th>Tanggal</th>
+                                    <th>Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,10 +76,26 @@ state([
 
                                         </td>
                                         <td>
-                                            {{ $comment->deleted_at ? "Dihapus" : "Aktif" }}
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="commentSwitch{{ $comment->id }}"
+                                                    wire:change="toggleStatus({{ $comment->id }})"
+                                                    @if ($comment->status) checked @endif>
+                                                <label class="form-check-label" for="commentSwitch{{ $comment->id }}">
+                                                    {{ $comment->status ? "Aktif" : "Non-Aktif" }}
+                                                </label>
+                                            </div>
                                         </td>
+
                                         <td>
                                             {{ $comment->created_at->translatedFormat("d F Y, H:i") }}
+                                        </td>
+                                        <td>
+                                            <button type="button" wire:click='delete({{ $comment->id }})'
+                                                class="btn btn-danger btn-sm">
+                                                Hapus
+                                            </button>
+
                                         </td>
                                     </tr>
                                 @endforeach

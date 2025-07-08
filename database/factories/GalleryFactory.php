@@ -26,7 +26,7 @@ class GalleryFactory extends Factory
             // Picsum dengan tema acak
             "https://picsum.photos/seed/{$seed}/640/480",
             // DummyImage sebagai fallback
-            "https://dummyimage.com/640x480/cccccc/000000&text=No+Image",
+            'https://dummyimage.com/640x480/cccccc/000000&text=No+Image',
         ];
 
         $imageContents = null;
@@ -47,11 +47,11 @@ class GalleryFactory extends Factory
         }
 
         // 3. Siapkan penyimpanan
-        $filename = Str::random(12) . '.jpg';
+        $filename = Str::random(12).'.jpg';
         $disk = Storage::disk('public');
         $dir = 'galleries';
 
-        if (!$disk->exists($dir)) {
+        if (! $disk->exists($dir)) {
             $disk->makeDirectory($dir);
         }
 
