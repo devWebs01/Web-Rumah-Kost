@@ -8,7 +8,6 @@ use function Laravel\Folio\{name};
 name("admin.comments.index");
 
 state([
-    "user" => Auth::user(),
     "comments" => fn() => Comment::get() ?? collect(),
 ]);
 

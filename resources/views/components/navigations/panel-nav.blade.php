@@ -60,6 +60,14 @@ $logout = function () {
                         <span class="hide-menu">Kos-Kosan</span>
                     </li>
                     <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route("website_system.show") }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-device-desktop-analytics"></i>
+                            </span>
+                            <span class="hide-menu">Sistem</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route("boardingHouses.index") }}" aria-expanded="false">
                             <span>
                                 <i class="ti ti-layout-dashboard"></i>

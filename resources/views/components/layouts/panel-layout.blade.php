@@ -10,6 +10,12 @@
 
         <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
 
+        <!-- Bootstrap Icons (Tambahkan ini) -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+        <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+        ...
+
         @stack("styles")
 
         <style>
@@ -131,6 +137,16 @@
                             @endif
                         </ol>
                     </nav>
+
+                    <div wire:offline>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+
+                            <strong>Alert!</strong> This device is currently offline.
+                        </div>
+
+                    </div>
 
                     {{ $slot }}
                 </div>
