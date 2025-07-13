@@ -79,7 +79,7 @@ class UserFactory extends Factory
                 $user->identity()->create([
                     'phone_number' => '628'.fake()->numerify('#########'),
                     // 'whatsapp_number' => '628'.fake()->numerify('#########'),
-                    'whatsapp_number' => '6282280514945',
+                    'whatsapp_number' => '6282282432437',
                     'id_card' => $imagePath ?? 'default.png',
                     'address' => fake()->address(),
                 ]);

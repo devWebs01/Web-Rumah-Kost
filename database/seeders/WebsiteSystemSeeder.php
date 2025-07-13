@@ -17,8 +17,8 @@ class WebsiteSystemSeeder extends Seeder
             'facebook' => 'https://facebook.com/e.kos.fake',
             'twitter' => 'https://twitter.com/e_kos_fake',
             'instagram' => 'https://instagram.com/ekos.fake',
-            'phone_number' => '6282280514945',
-            'whatsapp_number' => '6282280514945',
+            'phone_number' => '6282282432437',
+            'whatsapp_number' => '6282282432437',
 
         ]);
     }
