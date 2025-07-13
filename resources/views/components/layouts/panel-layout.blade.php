@@ -152,6 +152,9 @@
                 </div>
             </div>
         </div>
+
+        @include("components.partials.config")
+
         <script src="{{ asset("be-assets/libs/jquery/dist/jquery.min.js") }}"></script>
         <script src="{{ asset("be-assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js") }}"></script>
         <script src="{{ asset("be-assets/js/sidebarmenu.js") }}"></script>

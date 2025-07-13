@@ -59,13 +59,41 @@ $logout = function () {
                         <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                         <span class="hide-menu">Kos-Kosan</span>
                     </li>
+
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route("website_system.show") }}" aria-expanded="false">
-                            <span>
-                                <i class="ti ti-device-desktop-analytics"></i>
-                            </span>
-                            <span class="hide-menu">Sistem</span>
+                        <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)"
+                            aria-expanded="false">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="d-flex">
+                                    <i class="ti ti-chart-donut-3"></i>
+                                </span>
+                                <span class="hide-menu">Sistem</span>
+                            </div>
                         </a>
+                        <ul aria-expanded="false" class="collapse first-level">
+                            <li class="sidebar-item">
+                                <a class="sidebar-link justify-content-between" target="_blank"
+                                    href="{{ route("website_system.show") }}">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="round-16 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-circle"></i>
+                                        </div>
+                                        <span class="hide-menu">Data Sistem</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link justify-content-between" target="_blank"
+                                    href="{{ route("admin.backups") }}">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="round-16 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-circle"></i>
+                                        </div>
+                                        <span class="hide-menu">Backup Sistem</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route("boardingHouses.index") }}" aria-expanded="false">

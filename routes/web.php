@@ -26,11 +26,8 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/wa', function () {
     $fonnte = new \App\Services\FonnteService;
 
-    $userPhone = '08978301766'; // pastikan nomor aktif & terdaftar
-
+    $userPhone = '6282280514945'; // pastikan nomor aktif & terdaftar
     $message = 'WOIIIIIIIIIIIIIIIII Halo! Ini adalah pesan tes dari sistem Laravel.';
+    $fonnte->send($userPhone, $message);
 
-    $result = $fonnte->send($userPhone, $message);
-
-    dd($result); // Lihat hasil response dari Fonnte
 });

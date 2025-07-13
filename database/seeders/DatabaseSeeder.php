@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             BoardingHouseSeeder::class,
             WebsiteSystemSeeder::class,
+            BackupSeeder::class,
         ]);
 
         \App\Models\Comment::factory(30)->create();
