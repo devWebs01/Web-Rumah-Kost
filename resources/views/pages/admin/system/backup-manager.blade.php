@@ -33,38 +33,53 @@ $loadBackups = function () {
         ->all();
 };
 
-$createBackup = function () {
-    Artisan::call("db:seed --class=BackupSeeder");
-    Artisan::call("queue:work --once");
-
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
-
-    $this->redirectRoute("admin.backups");
-};
-
 $downloadBackup = function ($fileName) {
-    $disk = Storage::disk(config("backup.backup.destination.disks")[0]);
-    return response()->streamDownload(function () use ($disk, $fileName) {
-        echo $disk->get(config("backup.backup.name") . "/" . $fileName);
-    }, $fileName);
-};
+    try {
+        $disk = Storage::disk(config("backup.backup.destination.disks")[0]);
+        $filePath = config("backup.backup.name") . "/" . $fileName;
 
+        if (!$disk->exists($filePath)) {
+            throw new \Exception("File backup tidak ditemukan: {$fileName}");
+        }
+
+        LivewireAlert::title("Proses Berhasil!")
+            ->position("center")
+            ->success()
+            ->toast()
+            ->show();
+
+        return response()->streamDownload(function () use ($disk, $filePath) {
+            echo $disk->get($filePath);
+        }, $fileName);
+
+    } catch (\Throwable $e) {
+        LivewireAlert::title("Terjadi Kesalahan!")
+            ->position("center")
+            ->error()
+            ->toast()
+            ->show();
+
+        // Jika ingin reload daftar backup setelah error
+        $this->loadBackups();
+    }
+};
 
 
 ?>
 <x-panel-layout>
-    <x-slot name="title">Data Komentar</x-slot>
+    <x-slot name="title">Data Backup</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item">
-            <a href="#">Data Komentar</a>
+            <a href="#">Data Backup</a>
         </li>
     </x-slot>
     @volt
         <div>
             @include("components.partials.datatable")
 
-            <div class="d-flex justify-content-start mb-3">
-                <button wire:click='createBackup' class="btn btn-primary">Buat Backup</button>
+            <div class="d-flex justify-content-between mb-3">
+                <a href='{{ route("backup-system") }}' class="btn btn-primary">Buat Backup</a>
+                {{-- <a href='{{ route("backup-clean-all") }}' class="btn btn-danger">Hapus Semua Backup</a> --}}
             </div>
             <div class="card" wire:ignore>
                 <div class="card-body ">
@@ -90,6 +105,10 @@ $downloadBackup = function ($fileName) {
                                         <td>
                                             <button wire:click="downloadBackup('{{ $backup["file_name"] }}')"
                                                 class="btn btn-sm btn-success">Download</button>
+
+                                            <a href="{{ route("backup.delete", $backup["file_name"]) }}"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Yakin ingin menghapus backup ini?')">Delete</a>
 
                                         </td>
                                     </tr>

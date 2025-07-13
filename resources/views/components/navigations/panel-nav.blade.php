@@ -72,8 +72,7 @@ $logout = function () {
                         </a>
                         <ul aria-expanded="false" class="collapse first-level">
                             <li class="sidebar-item">
-                                <a class="sidebar-link justify-content-between" target="_blank"
-                                    href="{{ route("website_system.show") }}">
+                                <a class="sidebar-link justify-content-between" href="{{ route("website_system.show") }}">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="round-16 d-flex align-items-center justify-content-center">
                                             <i class="ti ti-circle"></i>
@@ -83,8 +82,7 @@ $logout = function () {
                                 </a>
                             </li>
                             <li class="sidebar-item">
-                                <a class="sidebar-link justify-content-between" target="_blank"
-                                    href="{{ route("admin.backups") }}">
+                                <a class="sidebar-link justify-content-between" href="{{ route("admin.backups") }}">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="round-16 d-flex align-items-center justify-content-center">
                                             <i class="ti ti-circle"></i>
