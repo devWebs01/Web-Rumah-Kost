@@ -70,6 +70,7 @@ Route::get('/clean', function () {
 
 })->name('backup-clean-all');
 
+
 Route::get('/laravel/{file}', function ($file) {
     // Basic sanitization to prevent directory traversal attacks
     if (str_contains($file, '..') || str_contains($file, '/') || str_contains($file, '\\')) {
