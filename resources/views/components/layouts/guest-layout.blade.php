@@ -16,7 +16,7 @@
 
         @stack("styles")
 
-        @vite([])
+        {{-- @vite([]) --}}
     </head>
 
     <body>
