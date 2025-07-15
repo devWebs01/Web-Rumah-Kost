@@ -66,7 +66,7 @@
                         placeholder="Bagikan pengalaman Anda menginap di sini...">
                     </textarea>
                 </div>
-                <button type="submit" class="btn btn-success">Kirim Review</button>
+                <button type="submit" class="btn btn-primary">Kirim Review</button>
             </form>
         </div>
     </div>

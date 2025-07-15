@@ -3,6 +3,7 @@
 use function Livewire\Volt\{state};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use function Laravel\Folio\{name};
+use App\Models\Room;
 use Carbon\Carbon;
 
 name("owner.transactions.show");
@@ -13,12 +14,26 @@ $confirmed = function () {
     $this->transaction->update([
         "status" => "confirmed",
     ]);
+
+    // Ubah status kamar jadi 'occupied'
+    $this->transaction->room->update([
+        "status" => "occupied",
+    ]);
+
+    LivewireAlert::title("Transaksi telah dikonfirmasi!")->position("center")->success()->toast()->show();
 };
 
 $cancelled = function () {
     $this->transaction->update([
         "status" => "cancelled",
     ]);
+
+    // Ubah status kamar jadi 'available'
+    $this->transaction->room->update([
+        "status" => "available",
+    ]);
+
+    LivewireAlert::title("Transaksi berhasil ditolak dan kamar tersedia kembali!")->position("center")->warning()->toast()->show();
 };
 
 ?>
@@ -53,17 +68,20 @@ $cancelled = function () {
                         {{-- Action Buttons (Re-locate if needed based on the image, but putting them at the end makes sense) --}}
                         <div class="card-header mb-5">
                             @if ($transaction->status === "pending")
-                                <div class=" gap-2">
-                                    <button type="button" wire:click='confirmed' class="btn btn-success px-4 me-2">
+                                <div class="gap-2">
+                                    <button type="button" wire:click="confirmed"
+                                        wire:confirm="Apakah Anda yakin ingin mengonfirmasi transaksi ini?"
+                                        class="btn btn-success px-4 me-2">
                                         <i class="bi bi-check-circle-fill me-2"></i>
                                         Konfirmasi Transaksi
                                     </button>
 
-                                    <button type="button" wire:click='cancelled' class="btn btn-outline-danger px-4">
-                                        <i class="bi bi-check-circle me-2"></i>
+                                    <button type="button" wire:click="cancelled"
+                                        wire:confirm="Apakah Anda yakin ingin menolak transaksi ini?"
+                                        class="btn btn-outline-danger px-4">
+                                        <i class="bi bi-x-circle me-2"></i>
                                         Tolak Transaksi
                                     </button>
-
                                 </div>
                             @else
                                 <div
@@ -237,7 +255,8 @@ $cancelled = function () {
 
                                     <div class="col-4 text-end fw-bold">Email:</div>
                                     <div class="col-8 mb-1">
-                                        <div style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                        <div
+                                            style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
                                             {{ $transaction->user->email ?? "-" }}
                                         </div>
                                     </div>
