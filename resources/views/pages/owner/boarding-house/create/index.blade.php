@@ -1,20 +1,20 @@
 <?php
 
 use App\Models\{BoardingHouse, Room};
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use function Livewire\Volt\{state, on, usesFileUploads};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
 usesFileUploads();
 
-state([
-    "step" => 1,
-])->url();
+state(["step" => 1])->url();
 
 state([
     "user" => Auth::user(),
     "boardingHouse" => fn() => $this->user->boardingHouse ?? null,
 
-    // kos
+    // Kos
     "name",
     "location_map",
     "address",
@@ -29,195 +29,188 @@ state([
     "question_room" => "form1",
 
     // Kamar banyak tipe
-    "type_rooms" => [],
-    "price_rooms" => [],
-    "size_rooms" => [],
+    "rooms" => [],
 
     // Kamar 1 tipe
-    "room_number",
     "price",
     "size",
 
-    // Fasilitas & aturan
+    // Fasilitas & Aturan
     "facilities" => [],
     "regulations" => [],
 
-    //
-    "rooms" => [],
+    // Galeri
     "galleries" => [],
     "prevgalleries",
 ]);
 
+// Button navigation
 on([
-    "prevBtn_updated" => function () {
-        if ($this->step < 1) {
-            $this->step = 1;
-        }
-    },
-    "nextBtn_updated" => function () {
-        if ($this->step > 3) {
-            $this->step = 1;
-        }
-    },
+    "prevBtn_updated" => fn() => ($this->step = max(1, $this->step)),
+    "nextBtn_updated" => fn() => ($this->step = $this->step > 3 ? 1 : $this->step),
 ]);
 
-$addRoom = function () {
-    $this->rooms[] = [
-        "type" => "",
-        "price" => "",
-        "size" => "",
-        "total" => "",
-    ];
-};
+$addRoom = fn() => ($this->rooms[] = ["type" => "", "price" => "", "size" => "", "total" => ""]);
+$removeRoom = fn($index) => array_splice($this->rooms, $index, 1);
 
-$removeRoom = function ($index) {
-    array_splice($this->rooms, $index, 1);
-};
-
-$prevBtn = function () {
-    $this->step--;
-    $this->dispatch("count_step");
-};
+$prevBtn = fn() => $this->step-- && $this->dispatch("count_step");
 
 $nextBtn = function () {
+    match ($this->step) {
+        1 => $this->validate([
+            "name" => "required|string|max:255",
+            "address" => "required|string|min:10",
+            "thumbnail" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            "category" => "required|in:male,female,mixed",
+            "minimum_rental_period" => "required|in:1,3,6,12",
+            "location_map" => "required|url",
+        ]),
+        2 => $this->question_room === "form1"
+            ? $this->validate([
+                "price" => "required|numeric|min:0",
+                "size" => "required|string",
+                "total_rooms" => "required|integer|min:1",
+                "galleries" => "required|array|min:1",
+                "galleries.*" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            ])
+            : $this->validate([
+                "rooms" => "required|array|min:1",
+                "rooms.*.type" => "required|string",
+                "rooms.*.price" => "required|numeric|min:0",
+                "rooms.*.size" => "required|string",
+                "rooms.*.total" => "required|integer|min:1",
+                "galleries" => "required|array|min:1",
+                "galleries.*" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            ]),
+        3 => $this->validate([
+            "facilities" => "required|array|min:1",
+            "facilities.*" => "required|string|min:2|max:100",
+            "regulations" => "required|array|min:1",
+            "regulations.*" => "required|string|min:2|max:100",
+        ]),
+    };
+
     $this->step++;
     $this->dispatch("nextBtn_updated");
 };
 
-$updatingGalleries = function ($value) {
-    $this->prevgalleries = $this->galleries;
-};
+$updatingGalleries = fn() => ($this->prevgalleries = $this->galleries);
 
-$updatedGalleries = function ($value) {
-    $this->galleries = array_merge($this->prevgalleries, $value);
-};
+$updatedGalleries = fn($value) => is_array($value) && ($this->galleries = array_merge($this->prevgalleries ?? [], $value));
 
 $removeItem = function ($key) {
     if (isset($this->galleries[$key])) {
-        $file = $this->galleries[$key];
-        $file->delete();
+        $this->galleries[$key]->delete();
         unset($this->galleries[$key]);
+        $this->galleries = array_values($this->galleries);
     }
-
-    $this->galleries = array_values($this->galleries);
 };
 
 $save = function () {
-    // Validasi data boarding house
-    $validatedBoardingHouse = $this->validate([
-        "name" => "required|string|max:255",
-        "location_map" => "nullable|url",
-        "address" => "required|string",
-        "thumbnail" => "required|image|mimes:jpeg,png,jpg",
-        "category" => "required|in:male,female,mixed",
-        "minimum_rental_period" => "required|in:1,3,6,12",
-    ]);
-
-    $validatedBoardingHouse["owner_id"] = Auth::user()->id;
-    $validatedBoardingHouse["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
-
-    // Simpan BoardingHouse
-    $boardingHouse = BoardingHouse::updateOrCreate($validatedBoardingHouse);
-
-    // Simpan kamar berdasarkan tipe
-    if ($this->question_room === "form1") {
-        // Validasi form1
-        $this->validate([
-            "price" => "required|numeric|min:0",
-            "size" => "required|string",
-            "total_rooms" => "required|integer|min:1",
-        ]);
-
-        // Simpan kamar satu tipe
-        for ($i = 0; $i < $this->total_rooms; $i++) {
-            Room::create([
-                "boarding_house_id" => $boardingHouse->id,
-                "room_number" => $i + 1,
-                "price" => $this->price,
-                "size" => $this->size,
-            ]);
-        }
-    } elseif ($this->question_room === "form2") {
-        // Validasi form2 (berdasarkan array `rooms`)
-        $this->validate([
-            "rooms" => "required|array|min:1",
-            "rooms.*.type" => "required|string",
-            "rooms.*.price" => "required|numeric|min:0",
-            "rooms.*.size" => "required|string",
-            "rooms.*.total" => "required|integer|min:1",
-        ]);
-
-        foreach ($this->rooms as $room) {
-            for ($i = 0; $i < $room["total"]; $i++) {
-                Room::create([
-                    "boarding_house_id" => $boardingHouse->id,
-                    "room_number" => $room["type"] . "-" . ($i + 1),
-                    "price" => $room["price"],
-                    "size" => $room["size"],
-                ]);
-            }
-        }
-    }
-
-    $validatedFacility = $this->validate([
-        "facilities" => "required",
-        "facilities.*" => "required|string|min:2",
-    ]);
-
-    $facilities = is_array($this->facilities) ? $this->facilities : explode(",", $this->facilities);
-
-    foreach ($facilities as $facility) {
-        $boardingHouse->facilities()->create([
-            "name" => $facility,
-        ]);
-    }
-
-    $validatedRegulation = $this->validate([
-        "regulations" => "required",
-        "regulations.*" => "required|string|min:2",
-    ]);
-
-    foreach ($this->regulations as $regulation) {
-        $boardingHouse->regulations()->create([
-            "rule" => $regulation,
-        ]);
-    }
-
-    $validatedGalleries = $this->validate([
-        "galleries" => "required",
-        "galleries.*" => "required|image",
-    ]);
-
-    foreach ($this->galleries as $gallery) {
-        $path = $gallery->store("galleries", "public");
-
-        $boardingHouse->galleries()->create([
-            "image" => $path,
-        ]);
-    }
+    DB::beginTransaction();
 
     try {
-        $admin = \App\Models\User::where("email", "admin@testing.com")->first();
+        // Validasi Boarding House
+        $validated = $this->validate([
+            "name" => "required|string|max:255",
+            "location_map" => "required|url",
+            "address" => "required|string",
+            "thumbnail" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            "category" => "required|in:male,female,mixed",
+            "minimum_rental_period" => "required|in:1,3,6,12",
+            "facilities" => "required|array|min:1",
+            "facilities.*" => "required|string|min:2|max:100",
+            "regulations" => "required|array|min:1",
+            "regulations.*" => "required|string|min:2|max:100",
+            "galleries" => "required|array|min:1",
+            "galleries.*" => "required|image",
+        ]);
 
-        if ($admin && $admin->identity && $admin->identity->whatsapp_number) {
+        $validated["owner_id"] = Auth::id();
+        $validated["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
+
+        $boardingHouse = BoardingHouse::updateOrCreate(["owner_id" => Auth::id()], $validated);
+
+        // Rooms
+        if ($this->question_room === "form1") {
+            $this->validate([
+                "price" => "required|numeric|min:0",
+                "size" => "required|string",
+                "total_rooms" => "required|integer|min:1",
+            ]);
+
+            for ($i = 0; $i < $this->total_rooms; $i++) {
+                Room::create([
+                    "boarding_house_id" => $boardingHouse->id,
+                    "room_number" => $i + 1,
+                    "price" => $this->price,
+                    "size" => $this->size,
+                ]);
+            }
+        } else {
+            $this->validate([
+                "rooms" => "required|array|min:1",
+                "rooms.*.type" => "required|string",
+                "rooms.*.price" => "required|numeric|min:0",
+                "rooms.*.size" => "required|string",
+                "rooms.*.total" => "required|integer|min:1",
+            ]);
+
+            foreach ($this->rooms as $room) {
+                for ($i = 0; $i < $room["total"]; $i++) {
+                    Room::create([
+                        "boarding_house_id" => $boardingHouse->id,
+                        "room_number" => $room["type"] . "-" . ($i + 1),
+                        "price" => $room["price"],
+                        "size" => $room["size"],
+                    ]);
+                }
+            }
+        }
+
+        // Fasilitas & Aturan
+        $boardingHouse->facilities()->delete();
+        foreach ($this->facilities as $facility) {
+            $boardingHouse->facilities()->create(["name" => $facility]);
+        }
+
+        $boardingHouse->regulations()->delete();
+        foreach ($this->regulations as $regulation) {
+            $boardingHouse->regulations()->create(["rule" => $regulation]);
+        }
+
+        // Galeri
+        foreach ($this->galleries as $gallery) {
+            $path = $gallery->store("galleries", "public");
+            $boardingHouse->galleries()->create(["image" => $path]);
+        }
+
+        // Notifikasi Admin
+        $admin = \App\Models\User::where("email", "admin@testing.com")->first();
+        if ($admin && optional($admin->identity)->whatsapp_number) {
             $message = implode("\n", ["📢 *Pemberitahuan Data Kos Baru*", "", "Telah ditambahkan data kos baru oleh *{$boardingHouse->owner->name}*.", formatField("Nama Kos", $boardingHouse->name), formatField("Kategori", ucfirst($boardingHouse->category)), formatField("Alamat", $boardingHouse->address), formatField("Minimal Sewa", "{$boardingHouse->minimum_rental_period} bulan"), "", "Silakan cek detailnya di sistem admin."]);
 
             (new \App\Services\FonnteService())->send($admin->identity->whatsapp_number, $message);
         }
+
+        DB::commit();
+
+        LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+        $this->redirectRoute("boardingHouse.index");
     } catch (\Throwable $e) {
-        activity()
-            ->causedBy(Auth::user())
-            ->withProperties([
-                "exception" => $e->getMessage(),
-                "admin_email" => "admin@testing.com",
-            ])
-            ->log("Gagal mengirim notifikasi WA ke admin setelah menambahkan kos.");
+        DB::rollBack();
+
+        if ($e instanceof \Illuminate\Validation\ValidationException) {
+            if (array_key_exists("price", $e->errors()) || array_key_exists("size", $e->errors())) {
+                $this->step = 2;
+            }
+            if (array_key_exists("galleries", $e->errors())) {
+                $this->step = 3;
+            }
+        }
+
+        throw $e;
     }
-
-    // Flash alert sukses
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
-
-    $this->redirectRoute("boardingHouse.index");
 };
 
 ?>
@@ -228,32 +221,32 @@ $save = function () {
 
         <h3 class="fw-bolder text-center text-decoration-underline">Step {{ $step }}</h3>
 
-        <form wire:submit='save'>
-            {{-- Wizard --}}
+        @if ($errors->any())
+            <div class="alert alert-danger mt-3">
+                <strong>Terjadi kesalahan pada input:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>- {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form wire:submit="save" enctype="multipart/form-data">
             <div id="kostWizardCarousel" class="carousel slide" data-bs-interval="false">
                 <div class="carousel-inner">
-                    {{-- Step 1 --}}
                     @include("pages.owner.boarding-house.create.step1")
-
-                    {{-- Step 2 --}}
                     @include("pages.owner.boarding-house.create.step2")
-
-                    {{-- Step 3 --}}
                     @include("pages.owner.boarding-house.create.step3")
-
                 </div>
 
-                {{-- Wizard Controls --}}
                 <div class="d-flex justify-content-between mt-3">
-                    <button id="prevBtn" wire:click="prevBtn" class="btn btn-primary" type="button"
-                        data-bs-target="#kostWizardCarousel" data-bs-slide="prev" {{ $step < 2 ? "disabled" : "" }}
-                        wire:loading.attr="disabled">Sebelumnya</button>
-                    <button id="nextBtn" wire:click="nextBtn" class="btn btn-primary" type="button"
-                        data-bs-target="#kostWizardCarousel" data-bs-slide="next" {{ $step > 2 ? "disabled" : "" }}
-                        wire:loading.attr="disabled">Selanjutnya</button>
+                    <button wire:click="prevBtn" class="btn btn-primary" type="button"
+                        {{ $step < 2 ? "disabled" : "" }}>Sebelumnya</button>
+                    <button wire:click="nextBtn" class="btn btn-primary" type="button"
+                        {{ $step > 2 ? "disabled" : "" }}>Selanjutnya</button>
                 </div>
             </div>
         </form>
-
     </div>
 @endvolt

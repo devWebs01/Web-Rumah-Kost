@@ -136,11 +136,11 @@
                             </select>
                         </div>
                         @error("regulations")
-                            <small id="regulationsId" class="form-text text-danger">{{ $message }}</small>
+                            <small id="regulationsId" class="my-1 form-text text-danger">{{ $message }}</small>
                         @enderror
                         <br>
                         @error("regulations.*")
-                            <small id="regulationsId" class="form-text text-danger">{{ $message }}</small>
+                            <small id="regulationsId" class="my-1 form-text text-danger">{{ $message }}</small>
                         @enderror
                     </div>
                 </div>

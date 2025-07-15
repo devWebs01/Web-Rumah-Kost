@@ -10,12 +10,8 @@ name("boardingHouse.edit");
 usesFileUploads();
 
 state([
-    "step" => 1,
-])->url();
-
-state([
     "user" => Auth::user(),
-    "boardingHouse" => fn() => $this->user->boardingHouse ?? null,
+    "boardingHouse" => fn() => $this->user->boardingHouse,
 
     // kos
     "name" => fn() => $this->boardingHouse->name,
@@ -56,87 +52,78 @@ $removeItem = function ($key) {
 };
 
 $save = function () {
-    // Validasi data boarding house
-    $validatedBoardingHouse = $this->validate([
-        "name" => "required|string|max:255",
-        "location_map" => "nullable|url",
-        "address" => "required|string",
-        "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
-        "category" => "required|in:male,female,mixed",
-        "minimum_rental_period" => "required|in:1,3,6,12",
-    ]);
-
-    $validatedBoardingHouse["owner_id"] = Auth::id();
-
-    if ($this->thumbnail) {
-        $validatedBoardingHouse["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
-    } else {
-        $validatedBoardingHouse["thumbnail"] = $this->boardingHouse->thumbnail;
-    }
-
-    if ($this->boardingHouse->verification_status === "rejected") {
-        # code...
-        $validatedBoardingHouse["verification_status"] = "pending";
-    }
-
-    // Jika boardingHouse sudah ada, update
-    if ($this->boardingHouse) {
-        $this->boardingHouse->update($validatedBoardingHouse);
-        $boardingHouse = $this->boardingHouse;
-    } else {
-        $boardingHouse = BoardingHouse::create($validatedBoardingHouse);
-    }
-
-    // Hapus dan simpan ulang fasilitas
-    $boardingHouse->facilities()->delete();
-    $facilities = is_array($this->facilities) ? $this->facilities : explode(",", $this->facilities);
-
-    foreach ($facilities as $facility) {
-        $boardingHouse->facilities()->create([
-            "name" => $facility,
-        ]);
-    }
-
-    // Hapus dan simpan ulang aturan
-    $boardingHouse->regulations()->delete();
-    foreach ($this->regulations as $regulation) {
-        $boardingHouse->regulations()->create([
-            "rule" => $regulation,
-        ]);
-    }
-
-    // update gambar
-    if (count($this->galleries) > 0) {
-        $validatedGalleries = $this->validate([
-            "galleries" => "required",
-            "galleries.*" => "required|image",
+    try {
+        $validatedBoardingHouse = $this->validate([
+            "name" => "required|string|max:255",
+            "location_map" => "nullable|url",
+            "address" => "required|string",
+            "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
+            "category" => "required|in:male,female,mixed",
+            "minimum_rental_period" => "required|in:1,3,6,12",
         ]);
 
-        $galleries = $this->boardingHouse->galleries;
+        $validatedBoardingHouse["owner_id"] = Auth::id();
 
-        if ($galleries->isNotEmpty()) {
-            foreach ($galleries as $gallery) {
+        if ($this->thumbnail) {
+            $validatedBoardingHouse["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
+        } else {
+            $validatedBoardingHouse["thumbnail"] = $this->boardingHouse?->thumbnail;
+        }
+
+        if ($this->boardingHouse && $this->boardingHouse->verification_status === "rejected") {
+            $validatedBoardingHouse["verification_status"] = "pending";
+        }
+
+        if ($this->boardingHouse) {
+            $this->boardingHouse->update($validatedBoardingHouse);
+            $boardingHouse = $this->boardingHouse;
+        } else {
+            $boardingHouse = BoardingHouse::create($validatedBoardingHouse);
+        }
+
+        // Fasilitas
+        $boardingHouse->facilities()->delete();
+        $facilities = is_array($this->facilities) ? $this->facilities : explode(",", $this->facilities);
+
+        foreach ($facilities as $facility) {
+            $boardingHouse->facilities()->create(["name" => $facility]);
+        }
+
+        // Aturan
+        $boardingHouse->regulations()->delete();
+        foreach ($this->regulations as $regulation) {
+            $boardingHouse->regulations()->create(["rule" => $regulation]);
+        }
+
+        // Gambar
+        if (count($this->galleries) > 0) {
+            $this->validate([
+                "galleries" => "required",
+                "galleries.*" => "required|image",
+            ]);
+
+            $this->boardingHouse->galleries->each(function ($gallery) {
                 Storage::delete($gallery->image);
+                $gallery->delete();
+            });
+
+            foreach ($this->galleries as $gallery) {
+                $path = $gallery->store("galleries", "public");
+
+                $boardingHouse->galleries()->create([
+                    "image" => $path,
+                ]);
 
                 $gallery->delete();
             }
         }
 
-        foreach ($this->galleries as $gallery) {
-            $path = $gallery->store("galleries", "public");
+        LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
 
-            $boardingHouse->galleries()->create([
-                "image" => $path,
-            ]);
-
-            $gallery->delete();
-        }
+        $this->redirectRoute("boardingHouse.index");
+    } catch (\Exception $e) {
+        LivewireAlert::title("Gagal menyimpan data!")->position("center")->error()->show();
     }
-
-    // Flash alert sukses
-    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
-
-    $this->redirectRoute("boardingHouse.index");
 };
 
 ?>
@@ -153,43 +140,69 @@ $save = function () {
         <div>
             @include("components.partials.tom-select")
             @include("components.partials.dropzone")
+            @include("components.partials.fancybox")
 
             <form wire:submit='save'>
                 <div class="card border rounded">
                     <div class="card-body bg-white">
                         <div class="row">
-                            {{-- Nama Kos --}}
-                            <div class="col-12 mb-3">
-                                <label class="form-label">Nama Kos</label>
-                                <input type="text" class="form-control" wire:model="name"
-                                    placeholder="Masukkan nama kos">
-                                @error("name")
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    {{-- Nama Kos --}}
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Nama Kos</label>
+                                        <input type="text" class="form-control" wire:model="name"
+                                            placeholder="Masukkan nama kos">
+                                        @error("name")
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
 
-                            {{-- Thumbnail --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Foto Sampul Kos</label>
-                                <input type="file" class="form-control" wire:model="thumbnail"
-                                    placeholder="Link gambar thumbnail" accept="image/*">
-                                @error("thumbnail")
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
+                                    {{-- Thumbnail --}}
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Foto Sampul Kos</label>
+                                        <input type="file" class="form-control" wire:model="thumbnail"
+                                            placeholder="Link gambar thumbnail" accept="image/*">
+                                        @error("thumbnail")
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
 
-                            {{-- Kategori --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kategori Kos</label>
-                                <select class="form-select" wire:model="category">
-                                    <option selected disabled>Pilih Satu</option>
-                                    <option value="male">Laki-laki</option>
-                                    <option value="female">Perempuan</option>
-                                    <option value="mixed">Campur</option>
-                                </select>
-                                @error("category")
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                                    {{-- Kategori --}}
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Kategori Kos</label>
+                                        <select class="form-select" wire:model="category">
+                                            <option selected disabled>Pilih Satu</option>
+                                            <option value="male">Laki-laki</option>
+                                            <option value="female">Perempuan</option>
+                                            <option value="mixed">Campur</option>
+                                        </select>
+                                        @error("category")
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md text-end align-content-center">
+                                    {{-- Preview atau Placeholder --}}
+                                    <div class="my-3 mb-md-3">
+                                        @if ($thumbnail)
+                                            <a data-fancybox data-src="{{ $thumbnail->temporaryUrl() }}"
+                                                data-caption="Foto Sampul">
+                                                <img src="{{ $thumbnail->temporaryUrl() }}" class="img rounded-4 border"
+                                                    width="100%" height="200px" style="object-fit: cover;"
+                                                    alt="thumbnail" />
+                                            </a>
+                                        @else
+                                            <a data-fancybox
+                                                data-src="{{ !empty($boardingHouse->thumbnail) ? Storage::url($boardingHouse->thumbnail) : "https://dummyimage.com/600x400/000/bfbfbf&text=silahkan+tambahkan+foto+sampul" }}"
+                                                data-caption="Foto Sampul">
+                                                <img src="{{ !empty($boardingHouse->thumbnail) ? Storage::url($boardingHouse->thumbnail) : "https://dummyimage.com/600x400/000/bfbfbf&text=silahkan+tambahkan+foto+sampul" }}"
+                                                    class="img rounded-4 border" style="object-fit: cover;" width="100%"
+                                                    height="200px" alt="thumbnail" />
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
                             {{-- Maps --}}
