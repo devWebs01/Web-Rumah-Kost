@@ -67,12 +67,24 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => $data['role'], // tambahkan ini
         ]);
     }
 
     protected function registered(Request $request, $user)
     {
+        activity()
+            ->causedBy($user)
+            ->withProperties([
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ])
+            ->log('User '.$user->name.' telah login');
 
-        return redirect('/welcome')->with('success');
+        if (in_array($user->role, ['admin', 'owner'])) {
+            return redirect('/home');
+        }
+
+        return redirect('/');
     }
 }

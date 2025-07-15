@@ -28,47 +28,47 @@ state([
     "user_id" => fn() => $this->identity->user_id ?? null,
 ]);
 
-$edit = function () {
+$updateUser = function () {
     $user = $this->user;
 
-    $validatedUser = $this->validate([
-        "name" => "required|min:5",
-        "email" => "required|min:5|" . Rule::unique(User::class)->ignore($user->id),
-        "password" => "min:5|nullable",
+    $validated = $this->validate([
+        // User fields
+        "name" => ["required", "min:5"],
+        "email" => ["required", "email", "min:5", Rule::unique(User::class)->ignore($user->id)],
+        "password" => ["nullable", "min:5"],
+
+        // Identity fields
+        "phone_number" => ["required", "digits_between:10,15"],
+        "whatsapp_number" => ["required", "digits_between:10,15"],
+        "id_card" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
+        "address" => ["required", "string", "min:10", "max:255"],
     ]);
 
-    $user = $this->user;
+    // Proses data user
+    $userData = [
+        "name" => $validated["name"],
+        "email" => $validated["email"],
+    ];
 
-    // Jika wire:model password terisi, lakukan update password
-    if (!empty($this->password)) {
-        $validatedUser["password"] = bcrypt($this->password);
-    } else {
-        // Jika wire:model password tidak terisi, gunakan password yang lama
-        $validatedUser["password"] = $user->password;
+    if (!empty($validated["password"])) {
+        $userData["password"] = bcrypt($validated["password"]);
     }
 
-    $user->update($validatedUser);
+    $user->update($userData);
 
-    $this->validate([
-        "phone_number" => "required|digits_between:10,15",
-        "whatsapp_number" => "nullable|digits_between:10,15",
-        "id_card" => "nullable|image|mimes:jpeg,png,jpg|max:2048", // max 2MB
-        "address" => "required|string|min:10|max:255",
-    ]);
+    // Proses data identity
+    $identityData = [
+        "phone_number" => $validated["phone_number"],
+        "whatsapp_number" => $validated["whatsapp_number"] ?? null,
+        "address" => $validated["address"],
+    ];
 
-    $identityData = $this->only("phone_number", "whatsapp_number", "address");
-
-    // Simpan file jika ada
-    if ($this->id_card) {
-        $idCardPath = $this->id_card->store("id_cards", "public");
-        $identityData["id_card"] = $idCardPath;
+    if (!empty($this->id_card)) {
+        $identityData["id_card"] = $this->id_card->store("id_cards", "public");
     }
 
-    // Buat atau update identity
-    $user->identity()->updateOrCreate(
-        ["user_id" => $user->id], // key pencarian
-        $identityData, // data yang diisi atau diperbarui
-    );
+    $user->identity()->updateOrCreate(["user_id" => $user->id], $identityData);
+
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
 
     $this->redirectRoute("profile.owner");
@@ -95,7 +95,7 @@ $edit = function () {
                             <div class="col-9">
                                 <h4 class="fw-semibold mb-8">Data Profil Akun</h4>
                                 <p class="text-muted mb-4 fs-6">
-                                    Pada halaman profil akun, kamu dapat mengubah informasi pengguna.
+                                    Pada halaman update pengguna, kamu dapat mengubah informasi pengguna.
                                 </p>
                             </div>
                             <div class="col-3">
@@ -110,23 +110,32 @@ $edit = function () {
                 <div class="card border-0">
 
                     <div class="card-body border rounded">
-                        <form class="row" wire:submit='edit' method="POST" enctype="multipart/form-data">
+                        <form class="row" wire:submit='updateUser' method="POST" enctype="multipart/form-data">
 
                             <h4 class="fw-bold mb-3">Data Akun</h4>
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Nama Lengkap</label>
                                 <input type="text" name="name" class="form-control" wire:model="name" required>
+                                @error("name")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Alamat Email</label>
                                 <input type="email" name="email" class="form-control" wire:model="email" required>
+                                @error("email")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md mb-3">
                                 <label for="password" class="form-label">Password (Kosongkan jika tidak ingin
                                     mengubah)</label>
-                                <input type="password" name="password" class="form-control">
+                                <input type="password" name="password" class="form-control" wire:model="password">
+                                @error("password")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <h4 class="fw-bold mb-3">Data Identitas</h4>
@@ -138,33 +147,62 @@ $edit = function () {
                                         <label for="phone_number" class="form-label">Nomor Telepon</label>
                                         <input type="number" name="phone_number" class="form-control"
                                             wire:model="phone_number">
+                                        @error("phone_number")
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-12 mb-3">
                                         <label for="whatsapp_number" class="form-label">Nomor WhatsApp</label>
                                         <input type="number" name="whatsapp_number" class="form-control"
                                             wire:model="whatsapp_number">
+                                        @error("whatsapp_number")
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-12 mb-3">
-                                        <label for="id_card" class="form-label">Nomor WhatsApp</label>
+                                        <label for="id_card" class="form-label">Upload KTP / ID Card</label>
+
+                                        <div wire:loading wire:target="id_card" class="mb-2">
+                                            <div class="spinner-border text-warning spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <span class="ms-2 text-warning">Mengunggah file...</span>
+                                        </div>
+
                                         <input type="file" name="id_card" class="form-control" wire:model="id_card">
+
+                                        @error("id_card")
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                 </div>
                                 <div class="col-lg">
                                     @if ($id_card)
-                                        <img src="{{ $id_card->temporaryUrl() }}" class="img rounded-4" width="100%"
-                                            height="280px" alt="id_card" />
+                                        <a data-fancybox data-src="{{ $id_card->temporaryUrl() }}"
+                                            data-caption="ID Card User">
+                                            <img src="{{ $id_card->temporaryUrl() }}" class="img rounded-4" width="100%"
+                                                height="280px" style="object-fit: cover;" alt="id_card" />
+                                        </a>
                                     @else
-                                        <img src="{{ !empty($identity->id_card) ? Storage::url($identity->id_card) : "https://dummyimage.com/600x400/000/bfbfbf&text=silahkan+tambahkan+id+card" }}"
-                                            class="img rounded-4" width="100%" height="280px" alt="id_card" />
+                                        <a data-fancybox
+                                            data-src="{{ !empty($identity->id_card) ? Storage::url($identity->id_card) : "https://dummyimage.com/600x400/000/bfbfbf&text=silahkan+tambahkan+id+card" }}"
+                                            data-caption="ID Card User">
+                                            <img src="{{ !empty($identity->id_card) ? Storage::url($identity->id_card) : "https://dummyimage.com/600x400/000/bfbfbf&text=silahkan+tambahkan+id+card" }}"
+                                                class="img rounded-4" style="object-fit: cover;" width="100%"
+                                                height="280px" alt="id_card" />
+                                        </a>
                                     @endif
 
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label for="address" class="form-label">Alamat Lengkap</label>
                                     <textarea class="form-control" name="address" wire:model='address' id="address" rows="3">{{ $address }}</textarea>
+                                    @error("address")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="mt-4">

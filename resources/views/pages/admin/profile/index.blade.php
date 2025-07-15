@@ -4,10 +4,12 @@ use App\Models\User;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
-use function Livewire\Volt\{state, uses};
+use function Livewire\Volt\{state, usesFileUploads};
 use function Laravel\Folio\{name, middleware};
 
 middleware(["auth"]);
+
+usesFileUploads();
 
 name("profile.admin");
 
@@ -21,52 +23,47 @@ state([
     "identity" => fn() => $this->user->identity ?? null,
     "phone_number" => fn() => $this->identity->phone_number ?? null,
     "whatsapp_number" => fn() => $this->identity->whatsapp_number ?? null,
-    "id_card" => fn() => $this->identity->id_card ?? null,
     "address" => fn() => $this->identity->address ?? null,
     "user_id" => fn() => $this->identity->user_id ?? null,
 ]);
 
-$edit = function () {
+$updateUser = function () {
     $user = $this->user;
 
-    $validatedUser = $this->validate([
-        "name" => "required|min:5",
-        "email" => "required|min:5|" . Rule::unique(User::class)->ignore($user->id),
-        "password" => "min:5|nullable",
+    $validated = $this->validate([
+        // User fields
+        "name" => ["required", "min:5"],
+        "email" => ["required", "email", "min:5", Rule::unique(User::class)->ignore($user->id)],
+        "password" => ["nullable", "min:5"],
+
+        // Identity fields
+        "phone_number" => ["required", "digits_between:10,15"],
+        "whatsapp_number" => ["required", "digits_between:10,15"],
+        "address" => ["required", "string", "min:10", "max:255"],
     ]);
 
-    $user = $this->user;
+    // Proses data user
+    $userData = [
+        "name" => $validated["name"],
+        "email" => $validated["email"],
+    ];
 
-    // Jika wire:model password terisi, lakukan update password
-    if (!empty($this->password)) {
-        $validatedUser["password"] = bcrypt($this->password);
-    } else {
-        // Jika wire:model password tidak terisi, gunakan password yang lama
-        $validatedUser["password"] = $user->password;
+    if (!empty($validated["password"])) {
+        $userData["password"] = bcrypt($validated["password"]);
     }
 
-    $user->update($validatedUser);
+    $user->update($userData);
 
-    $this->validate([
-        "phone_number" => "required|digits_between:10,15",
-        "whatsapp_number" => "nullable|digits_between:10,15",
-        "id_card" => "nullable|image|mimes:jpeg,png,jpg|max:2048", // max 2MB
-        "address" => "required|string|min:10|max:255",
-    ]);
+    // Proses data identity
+    $identityData = [
+        "phone_number" => $validated["phone_number"],
+        "whatsapp_number" => $validated["whatsapp_number"] ?? null,
+        "address" => $validated["address"],
+    ];
 
-    $identityData = $this->only("phone_number", "whatsapp_number", "address");
 
-    // Simpan file jika ada
-    if ($this->id_card) {
-        $idCardPath = $this->id_card->store("id_cards", "public");
-        $identityData["id_card"] = $idCardPath;
-    }
+    $user->identity()->updateOrCreate(["user_id" => $user->id], $identityData);
 
-    // Buat atau update identity
-    $user->identity()->updateOrCreate(
-        ["user_id" => $user->id], // key pencarian
-        $identityData, // data yang diisi atau diperbarui
-    );
     LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
 
     $this->redirectRoute("profile.admin");
@@ -89,55 +86,84 @@ $edit = function () {
         <div>
             <x-slot name="title">{{ $user->name }}</x-slot>
 
-            <div class="card border-0">
-                <div class="alert alert-primary border-0" role="alert">
-                    <strong>Data Profile</strong>
-                    <p>Pada halaman edit pengguna, kamu dapat mengubah informasi pengguna.
-                    </p>
+            <div>
+                <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+                    <div class="card-body px-4 py-3">
+                        <div class="row align-items-center">
+                            <div class="col-9">
+                                <h4 class="fw-semibold mb-8">Data Profil Akun</h4>
+                                <p class="text-muted mb-4 fs-6">
+                                    Pada halaman update pengguna, kamu dapat mengubah informasi pengguna.
+                                </p>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-center mb-n5">
+                                    <img src="https://ouch-prod-var-cdn.icons8.com/iy/illustrations/thumbs/HX8M3yKf5cJ8K1f1.webp"
+                                        alt="modernize-img" class="img-fluid w-50 mb-n4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body border rounded">
-                    <form class="row" wire:submit='edit' method="POST" enctype="multipart/form-data">
+                <div class="card border-0">
 
-                        <h4 class="fw-bold mb-3">Data Akun</h4>
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control" wire:model="name" required>
-                        </div>
+                    <div class="card-body border rounded">
+                        <form class="row" wire:submit='updateUser' method="POST" enctype="multipart/form-data">
 
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Alamat Email</label>
-                            <input type="email" name="email" class="form-control" wire:model="email" required>
-                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Nama Lengkap</label>
+                                <input type="text" name="name" class="form-control" wire:model="name" required>
+                                @error("name")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="password" class="form-label">Password (Kosongkan jika tidak ingin
-                                mengubah)</label>
-                            <input type="password" name="password" class="form-control">
-                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Alamat Email</label>
+                                <input type="email" name="email" class="form-control" wire:model="email" required>
+                                @error("email")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <h4 class="fw-bold mb-3">Data Identitas</h4>
+                            <div class="col-md-12 mb-3">
+                                <label for="password" class="form-label">Password (Kosongkan jika tidak ingin
+                                    mengubah)</label>
+                                <input type="password" name="password" class="form-control" wire:model="password">
+                                @error("password")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="phone_number" class="form-label">Nomor Telepon</label>
-                            <input type="text" name="phone_number" class="form-control" wire:model="phone_number">
-                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone_number" class="form-label">Nomor Telepon</label>
+                                <input type="number" name="phone_number" class="form-control" wire:model="phone_number">
+                                @error("phone_number")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="whatsapp_number" class="form-label">Nomor WhatsApp</label>
-                            <input type="text" name="whatsapp_number" class="form-control" wire:model="whatsapp_number">
-                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="whatsapp_number" class="form-label">Nomor WhatsApp</label>
+                                <input type="number" name="whatsapp_number" class="form-control"
+                                    wire:model="whatsapp_number">
+                                @error("whatsapp_number")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="address" class="form-label">Alamat Lengkap</label>
+                                <textarea class="form-control" name="address" wire:model='address' id="address" rows="3">{{ $address }}</textarea>
+                                @error("address")
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">Update Data</button>
+                            </div>
+                        </form>
 
-                        <div class="col-12 mb-3">
-                            <label for="address" class="form-label">Alamat Lengkap</label>
-                            <textarea class="form-control" name="address" wire:model='address' id="address" rows="3">{{ $address }}
-                            </textarea>
-                        </div>
-
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">Update Data</button>
-                        </div>
-                    </form>
-
+                    </div>
                 </div>
             </div>
 

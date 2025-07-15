@@ -10,12 +10,13 @@
             rel="stylesheet">
         <link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
         <link rel="stylesheet" href="{{ asset("/fe-assets/css/style.css") }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
 
         @livewireStyles
 
         @stack("styles")
 
-        {{-- @vite([]) --}}
+        @vite([])
     </head>
 
     <body>
@@ -88,9 +89,16 @@
 
         <script src="https://kit.fontawesome.com/49d7584956.js" crossorigin="anonymous"></script>
 
-        @livewireScripts
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+        <script>
+            Fancybox.bind("[data-fancybox]", {
+                // Your custom options
+            });
+        </script>
 
         @stack("scripts")
+
+        @livewireScripts
     </body>
 
 </html>
