@@ -7,29 +7,6 @@ name("transactions.show");
 
 state(["transaction"]);
 
-// Dummy data untuk development/testing jika tidak ada data transaksi
-// if (!isset($transaction)) {
-//     $transaction = (object)[
-//         'code' => 'TRX0012345',
-//         'status' => 'paid',
-//         'check_in' => '2023-05-10',
-//         'check_out' => '2023-06-10',
-//         'total' => 1500000,
-//         'user' => (object)[
-//             'name' => 'Budi Santoso',
-//             'email' => 'budi.santoso@example.com',
-//         ],
-//         'room' => (object)[
-//             'room_number' => 'A101',
-//             'price' => 1500000,
-//             'boardingHouse' => (object)[
-//                 'name' => 'Kos Maju Jaya',
-//                 'address' => 'Jl. Merdeka No. 45, Jakarta',
-//             ],
-//         ],
-//     ];
-// }
-
 ?>
 
 <x-guest-layout>
