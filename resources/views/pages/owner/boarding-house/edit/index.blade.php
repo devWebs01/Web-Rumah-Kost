@@ -61,7 +61,7 @@ $save = function () {
         "name" => "required|string|max:255",
         "location_map" => "nullable|url",
         "address" => "required|string",
-        "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
+        "thumbnail" => "nullable|image",
         "category" => "required|in:male,female,mixed",
         "minimum_rental_period" => "required|in:1,3,6,12",
     ]);
