@@ -40,7 +40,7 @@ $updateUser = function () {
         // Identity fields
         "phone_number" => ["required", "digits_between:10,15"],
         "whatsapp_number" => ["required", "digits_between:10,15"],
-        "id_card" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
+        "id_card" => ["required", "image", "mimes:jpeg,png,jpg"],
         "address" => ["required", "string", "min:10", "max:255"],
     ]);
 

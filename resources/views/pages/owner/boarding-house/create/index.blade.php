@@ -60,7 +60,7 @@ $nextBtn = function () {
         1 => $this->validate([
             "name" => "required|string|max:255",
             "address" => "required|string|min:10",
-            "thumbnail" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            "thumbnail" => "required|image|mimes:jpeg,png,jpg",
             "category" => "required|in:male,female,mixed",
             "minimum_rental_period" => "required|in:1,3,6,12",
             "location_map" => "required|url",
@@ -71,7 +71,7 @@ $nextBtn = function () {
                 "size" => "required|string",
                 "total_rooms" => "required|integer|min:1",
                 "galleries" => "required|array|min:1",
-                "galleries.*" => "required|image|mimes:jpeg,png,jpg|max:2048",
+                "galleries.*" => "required|image|mimes:jpeg,png,jpg",
             ])
             : $this->validate([
                 "rooms" => "required|array|min:1",
@@ -80,7 +80,7 @@ $nextBtn = function () {
                 "rooms.*.size" => "required|string",
                 "rooms.*.total" => "required|integer|min:1",
                 "galleries" => "required|array|min:1",
-                "galleries.*" => "required|image|mimes:jpeg,png,jpg|max:2048",
+                "galleries.*" => "required|image|mimes:jpeg,png,jpg",
             ]),
         3 => $this->validate([
             "facilities" => "required|array|min:1",
@@ -115,7 +115,7 @@ $save = function () {
             "name" => "required|string|max:255",
             "location_map" => "required|url",
             "address" => "required|string",
-            "thumbnail" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            "thumbnail" => "required|image|mimes:jpeg,png,jpg",
             "category" => "required|in:male,female,mixed",
             "minimum_rental_period" => "required|in:1,3,6,12",
             "facilities" => "required|array|min:1",
