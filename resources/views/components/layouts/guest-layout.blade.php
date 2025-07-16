@@ -39,15 +39,34 @@
                 <div class="row">
                     <div class="col-lg mb-5 mb-lg-0">
                         <h3 class="footer-title">E-Kos</h3>
-                        <p class="text-white-50 mb-4">Platform terintegrasi untuk pencarian, booking, dan manajemen
-                            kos
-                            secara online. Temukan hunian nyaman sesuai kebutuhan Anda.</p>
+                        <p class="text-white-50 mb-4">
+                            Platform terintegrasi untuk pencarian, booking, dan manajemen kos secara online. Temukan
+                            hunian nyaman sesuai kebutuhan Anda.
+                        </p>
                         <div class="footer-social">
-                            <a href="{{ $website->facebook ?? "" }}"><i class="bi bi-facebook"></i></a>
-                            <a href="{{ $website->twitter ?? "" }}"><i class="bi bi-twitter"></i></a>
-                            <a href="{{ $website->instagram ?? "" }}"><i class="bi bi-instagram"></i></a>
+                            @if ($website->facebook)
+                                <a href="{{ $website->facebook }}"><i class="bi bi-facebook"></i></a>
+                            @endif
+                            @if ($website->twitter)
+                                <a href="{{ $website->twitter }}"><i class="bi bi-twitter"></i></a>
+                            @endif
+                            @if ($website->instagram)
+                                <a href="{{ $website->instagram }}"><i class="bi bi-instagram"></i></a>
+                            @endif
+                            @if ($website->whatsapp_number)
+                                <a href="https://wa.me/{{ preg_replace("/[^0-9]/", "", $website->whatsapp_number) }}"
+                                    target="_blank">
+                                    <i class="bi bi-whatsapp"></i>
+                                </a>
+                            @endif
+                            @if ($website->phone_number)
+                                <a href="tel:{{ $website->phone_number }}">
+                                    <i class="bi bi-telephone"></i>
+                                </a>
+                            @endif
                         </div>
                     </div>
+
                     <div class="col-lg-2 col-md-6 mb-5 mb-md-0">
                         <h5 class="footer-title">Tautan</h5>
                         <ul class="footer-links">
