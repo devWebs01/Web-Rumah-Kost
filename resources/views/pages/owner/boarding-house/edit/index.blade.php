@@ -10,8 +10,12 @@ name("boardingHouse.edit");
 usesFileUploads();
 
 state([
+    "step" => 1,
+])->url();
+
+state([
     "user" => Auth::user(),
-    "boardingHouse" => fn() => $this->user->boardingHouse,
+    "boardingHouse" => fn() => $this->user->boardingHouse ?? null,
 
     // kos
     "name" => fn() => $this->boardingHouse->name,
@@ -52,78 +56,87 @@ $removeItem = function ($key) {
 };
 
 $save = function () {
-    try {
-        $validatedBoardingHouse = $this->validate([
-            "name" => "required|string|max:255",
-            "location_map" => "nullable|url",
-            "address" => "required|string",
-            "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
-            "category" => "required|in:male,female,mixed",
-            "minimum_rental_period" => "required|in:1,3,6,12",
+    // Validasi data boarding house
+    $validatedBoardingHouse = $this->validate([
+        "name" => "required|string|max:255",
+        "location_map" => "nullable|url",
+        "address" => "required|string",
+        "thumbnail" => "nullable|image|mimes:jpeg,png,jpg",
+        "category" => "required|in:male,female,mixed",
+        "minimum_rental_period" => "required|in:1,3,6,12",
+    ]);
+
+    $validatedBoardingHouse["owner_id"] = Auth::id();
+
+    if ($this->thumbnail) {
+        $validatedBoardingHouse["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
+    } else {
+        $validatedBoardingHouse["thumbnail"] = $this->boardingHouse->thumbnail;
+    }
+
+    if ($this->boardingHouse->verification_status === "rejected") {
+        # code...
+        $validatedBoardingHouse["verification_status"] = "pending";
+    }
+
+    // Jika boardingHouse sudah ada, update
+    if ($this->boardingHouse) {
+        $this->boardingHouse->update($validatedBoardingHouse);
+        $boardingHouse = $this->boardingHouse;
+    } else {
+        $boardingHouse = BoardingHouse::create($validatedBoardingHouse);
+    }
+
+    // Hapus dan simpan ulang fasilitas
+    $boardingHouse->facilities()->delete();
+    $facilities = is_array($this->facilities) ? $this->facilities : explode(",", $this->facilities);
+
+    foreach ($facilities as $facility) {
+        $boardingHouse->facilities()->create([
+            "name" => $facility,
+        ]);
+    }
+
+    // Hapus dan simpan ulang aturan
+    $boardingHouse->regulations()->delete();
+    foreach ($this->regulations as $regulation) {
+        $boardingHouse->regulations()->create([
+            "rule" => $regulation,
+        ]);
+    }
+
+    // update gambar
+    if (count($this->galleries) > 0) {
+        $validatedGalleries = $this->validate([
+            "galleries" => "required",
+            "galleries.*" => "required|image",
         ]);
 
-        $validatedBoardingHouse["owner_id"] = Auth::id();
+        $galleries = $this->boardingHouse->galleries;
 
-        if ($this->thumbnail) {
-            $validatedBoardingHouse["thumbnail"] = $this->thumbnail->store("thumbnails", "public");
-        } else {
-            $validatedBoardingHouse["thumbnail"] = $this->boardingHouse?->thumbnail;
-        }
-
-        if ($this->boardingHouse && $this->boardingHouse->verification_status === "rejected") {
-            $validatedBoardingHouse["verification_status"] = "pending";
-        }
-
-        if ($this->boardingHouse) {
-            $this->boardingHouse->update($validatedBoardingHouse);
-            $boardingHouse = $this->boardingHouse;
-        } else {
-            $boardingHouse = BoardingHouse::create($validatedBoardingHouse);
-        }
-
-        // Fasilitas
-        $boardingHouse->facilities()->delete();
-        $facilities = is_array($this->facilities) ? $this->facilities : explode(",", $this->facilities);
-
-        foreach ($facilities as $facility) {
-            $boardingHouse->facilities()->create(["name" => $facility]);
-        }
-
-        // Aturan
-        $boardingHouse->regulations()->delete();
-        foreach ($this->regulations as $regulation) {
-            $boardingHouse->regulations()->create(["rule" => $regulation]);
-        }
-
-        // Gambar
-        if (count($this->galleries) > 0) {
-            $this->validate([
-                "galleries" => "required",
-                "galleries.*" => "required|image",
-            ]);
-
-            $this->boardingHouse->galleries->each(function ($gallery) {
+        if ($galleries->isNotEmpty()) {
+            foreach ($galleries as $gallery) {
                 Storage::delete($gallery->image);
-                $gallery->delete();
-            });
-
-            foreach ($this->galleries as $gallery) {
-                $path = $gallery->store("galleries", "public");
-
-                $boardingHouse->galleries()->create([
-                    "image" => $path,
-                ]);
 
                 $gallery->delete();
             }
         }
 
-        LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+        foreach ($this->galleries as $gallery) {
+            $path = $gallery->store("galleries", "public");
 
-        $this->redirectRoute("boardingHouse.index");
-    } catch (\Exception $e) {
-        LivewireAlert::title("Gagal menyimpan data!")->position("center")->error()->show();
+            $boardingHouse->galleries()->create([
+                "image" => $path,
+            ]);
+
+            $gallery->delete();
+        }
     }
+
+    // Flash alert sukses
+    LivewireAlert::title("Proses Berhasil!")->position("center")->success()->toast()->show();
+
+    $this->redirectRoute("boardingHouse.index");
 };
 
 ?>
@@ -140,7 +153,6 @@ $save = function () {
         <div>
             @include("components.partials.tom-select")
             @include("components.partials.dropzone")
-            @include("components.partials.fancybox")
 
             <form wire:submit='save'>
                 <div class="card border rounded">
